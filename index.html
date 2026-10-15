@@ -1,0 +1,2555 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>mywall. – your space. your pace.</title>
+<style>
+:root{
+  --bg:#f5f6f7;--card:#ffffff;--ink:#16181c;--mut:#6c747d;--line:#e3e6ea;
+  --acc-l:#1a1d21;--acc-d:#f1f2f4;--acc:var(--acc-l);--on:#fff;
+  --warm:#d9a520;--ok:#2f8f5b;--bad:#c8473d;--r:10px;
+  --sh:0 1px 2px rgba(20,24,30,.04),0 6px 20px rgba(20,24,30,.05);
+  --display:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+[data-theme=forest]{--acc-l:#2f6b57;--acc-d:#74c7a5}
+[data-theme=plum]{--acc-l:#7a3b69;--acc-d:#dc92c8}
+[data-theme=coral]{--acc-l:#cf4f38;--acc-d:#ff8f77}
+[data-theme=ocean]{--acc-l:#1f6f9c;--acc-d:#6cbde8}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0f1012;--card:#17181b;--ink:#eceef1;--mut:#9a9fa7;--line:#2a2c31;
+  --acc:var(--acc-d);--on:#111214;--ok:#5fcf8f;--bad:#ff8379;--sh:none}}
+:root{--accs:color-mix(in srgb,var(--acc) 13%,var(--card))}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:90px;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;line-height:1.2}
+h1{font-size:30px;font-weight:600;letter-spacing:-.03em}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--mut);font-weight:600}
+h3{font-size:15px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+a{color:var(--acc)}
+
+/* rozvržení: tmavý postranní panel */
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.side{background:#17191c;color:#c8cbd1;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:24px 14px 16px;overflow:auto}
+.brand{display:block;text-align:center;padding:2px 4px 18px}.brand .lock{display:flex;align-items:center;justify-content:center;gap:10px}
+.brand .logo{width:70px;height:52px;flex:none;display:block}.brand .logo svg{width:100%;height:100%;display:block}
+.brand b{display:block;color:#ded9c7;font-family:"Poppins","Nunito Sans","Segoe UI",system-ui,sans-serif;font-size:30px;letter-spacing:-.02em;font-weight:700;line-height:1;white-space:nowrap}
+.brand .slogan{display:block;font-size:10.5px;letter-spacing:.02em;color:#807e76;margin-top:9px;white-space:nowrap}
+.sidesec{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#7d8189;padding:22px 12px 8px;display:flex;justify-content:space-between;align-items:center}
+.sidesec button{background:none;border:0;color:#9ca0a7;font-size:18px;line-height:1;padding:0 4px}
+.sidesec button:hover{color:#fff}
+nav.tabs{display:flex;flex-direction:column;gap:2px}
+nav.tabs button{display:flex;align-items:center;gap:12px;border:0;background:none;color:#c8cbd1;padding:11px 12px;border-radius:6px;font-weight:500;text-align:left;font-size:15px}
+nav.tabs button:hover{background:rgba(255,255,255,.05)}
+nav.tabs button.on{background:rgba(255,255,255,.1);color:#fff}
+nav.tabs .ic{width:22px;text-align:center;font-size:17px;opacity:.9}
+.sideproj button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;color:#c8cbd1;padding:7px 12px;border-radius:6px;font-size:14px;text-align:left}
+.sideproj button:hover{background:rgba(255,255,255,.05)}
+.sideproj .dot{width:9px;height:9px;flex:none}
+.sideproj em{margin-left:auto;font-style:normal;font-size:11px;color:#8c9097;background:rgba(255,255,255,.08);padding:1px 8px;border-radius:99px}
+.sideproj .none{padding:6px 12px;font-size:13px;color:#7d8189}
+.sidefoot{margin-top:auto;padding:16px 8px 0;border-top:1px solid rgba(255,255,255,.08)}
+.sidefoot .small{color:#7d8189;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
+.themes{display:flex;gap:8px;margin-bottom:14px}
+.themes button{width:20px;height:20px;border-radius:50%;border:2px solid #17191c;box-shadow:0 0 0 1px rgba(255,255,255,.25);padding:0}
+.themes button.on{box-shadow:0 0 0 2px #fff}
+.crumbbar{display:flex;align-items:center;gap:12px;padding:14px 44px;border-bottom:1px solid var(--line);background:var(--card);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+.crumbbar b{color:var(--ink);font-weight:600}
+.crumbbar .sp{flex:1}
+.crumbbar .sync{letter-spacing:.03em;text-transform:none;font-size:12.5px}
+.crumbbar .sync::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:8px}
+.mtop{display:none}
+main{max-width:1280px;margin:0 auto;padding:38px 44px 48px}
+.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.pagehead{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:24px}
+.pagehead .sub{color:var(--mut);margin-top:10px}
+h1{font-size:42px;letter-spacing:-.03em}
+@media(max-width:900px){
+  body{padding-bottom:84px}
+  .shell{display:block}
+  .side{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:30;overflow:visible;border-top:1px solid rgba(255,255,255,.1)}
+  .side .brand,.side .sidesec,.side .sideproj,.side .sidefoot{display:none}
+  nav.tabs{flex-direction:row;flex:1;justify-content:space-around}
+  nav.tabs button{flex-direction:column;gap:1px;font-size:10.5px;padding:6px 2px;flex:1;align-items:center;text-align:center}
+  nav.tabs .ic{font-size:19px}
+  .crumbbar{display:none}
+  .mtop{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .mtop .themes{margin:0 0 0 auto}.mtop{background:#17191c;border-bottom-color:#17191c}.mtop .brand{display:block;padding:0;text-align:left}.mtop .brand .logo{width:46px;height:34px}.mtop .brand .lock{gap:8px}.mtop .brand b{font-size:22px}.mtop .brand .slogan{display:none}.mtop .themes button{border-color:#17191c}
+  .mtop .themes button{border-color:var(--card);box-shadow:0 0 0 1px var(--line)}
+  .mtop .themes button.on{box-shadow:0 0 0 2px var(--ink)}
+  main{padding:20px 14px 30px}
+  h1{font-size:32px}
+}
+
+/* základní prvky */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.card+.card{margin-top:14px}
+.btn{border:1px solid var(--line);background:var(--card);padding:9px 15px;border-radius:8px;font-weight:600;transition:.15s}
+.btn:hover{border-color:var(--acc);color:var(--acc)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.btn.pri:hover{filter:brightness(1.08);color:var(--on)}
+.btn.ghost{border-color:transparent;background:none;color:var(--acc);padding:6px 10px}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:5px 11px;font-size:13px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sp{flex:1}
+.mut{color:var(--mut)}
+.small{font-size:12.5px}
+.empty{padding:18px;border:1.5px dashed var(--line);border-radius:16px;color:var(--mut);text-align:center}
+.banner{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warm);padding:10px 14px;border-radius:8px;margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sec{margin:22px 0 10px}
+.sec:first-child{margin-top:0}
+.cols2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:26px}
+@media(max-width:980px){.cols2{grid-template-columns:1fr}}
+
+/* přehledový pás a tmavá dlaždice */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:28px}
+.strip>div{padding:20px 24px;border-left:1px solid var(--line)}
+.strip>div:first-child{border-left:0}
+.strip small{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.strip b{display:block;font-size:38px;font-weight:300;letter-spacing:-.02em;line-height:1.15;margin:10px 0 2px}
+.strip b u{text-decoration:none;font-size:17px;color:var(--mut);margin-left:4px;font-weight:400}
+.strip span{font-size:12px;color:var(--mut)}
+@media(max-width:700px){.strip>div{border-left:0;border-top:1px solid var(--line)}.strip>div:first-child{border-top:0}}
+.focus{background:#17191c;color:#e9eaed;border-radius:10px;padding:26px;margin-bottom:24px}
+.focus small{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#8c9097}
+.focus h3{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:14px 0 10px;line-height:1.2;overflow-wrap:anywhere}
+.focus p{color:#a4a8af;margin:0 0 18px;font-size:14px}
+.focus .lnk{background:none;border:0;border-bottom:1px solid #8c9097;color:#fff;padding:2px 0 6px;font-weight:500;margin-right:20px}
+.focus .lnk:hover{border-color:#fff}.lr{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}.lr b{width:112px;flex:none}.lr span{color:var(--mut)}
+
+/* položky */
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px 13px;border:1px solid color-mix(in srgb,var(--c,var(--line)) 30%,var(--line));border-radius:10px;background:color-mix(in srgb,var(--c,var(--line)) 7%,var(--card));margin-bottom:9px;transition:transform .12s,box-shadow .12s}
+.item:hover{box-shadow:var(--sh)}
+.item .body{flex:1;min-width:0;cursor:pointer}
+.item .t{font-weight:650;overflow-wrap:anywhere}
+.item .m{font-size:12.5px;color:var(--mut);margin-top:1px}
+.item .d{font-size:12.5px;color:var(--mut);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.item.done{opacity:.78}
+.item.done .t{text-decoration:line-through;text-decoration-thickness:1.5px;color:var(--mut)}
+.item.ev{background:var(--bg);border-style:dashed;--c:#999}
+.item.late{border-color:color-mix(in srgb,var(--bad) 55%,var(--line))}
+.item.tk{--c:var(--line);background:var(--card)}
+.badge{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;font-size:20px;flex:none;background:color-mix(in srgb,var(--c) 20%,var(--card))}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid color-mix(in srgb,var(--mut) 55%,var(--line));background:var(--card);flex:none;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fff;padding:0;margin-top:1px;transition:.15s}
+.chk:hover{border-color:var(--ok)}
+.chk.on{background:var(--ok);border-color:var(--ok)}
+.chip{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11.5px;font-weight:700;background:color-mix(in srgb,var(--c) 17%,transparent);color:var(--c);margin-right:4px}
+@media(prefers-color-scheme:dark){.chip{color:color-mix(in srgb,var(--c) 60%,#fff)}}
+.pdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;background:var(--mut)}
+.pdot.p1{background:var(--bad)}.pdot.p2{background:var(--warm)}.pdot.p3{background:#9bb0a6}
+.feel{font-size:16px}
+
+/* týden */
+.wk-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.wk-title{font-size:24px;font-weight:600;min-width:200px;text-align:center}
+.sumbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{font-size:30px;font-weight:300;letter-spacing:-.02em;display:block;line-height:1.15}
+.stat span{font-size:12px;color:var(--mut)}
+.grid7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.day{background:color-mix(in srgb,var(--card) 70%,var(--bg));border:1px solid var(--line);border-radius:12px;padding:10px;min-height:220px}
+.day.today{background:var(--card);border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 18%,transparent)}
+.day.drop{outline:2px dashed var(--acc);outline-offset:2px}
+.day h3{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);display:flex;justify-content:space-between;align-items:center;margin:2px 2px 8px}
+.day.today h3{color:var(--acc)}
+.day .item{padding:9px;gap:8px;border-radius:14px}
+.day .badge{display:none}
+.day .item .t{font-size:13.5px}
+.day .add{display:flex;gap:4px;margin-top:4px}
+.day .add button{flex:1;border:1px dashed var(--line);background:none;border-radius:10px;padding:4px;font-size:12px;color:var(--mut)}
+.day .add button:hover{border-color:var(--acc);color:var(--acc)}
+@media(max-width:1180px){.grid7{grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}.day{min-height:0}.day .badge{display:grid}}
+
+/* úkoly */
+.quick{width:100%;padding:12px 16px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);margin-bottom:12px}
+.quick:focus{outline:none;border-color:var(--acc)}
+.fchips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 16px}
+.fchips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--mut)}
+.fchips button.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.pg{margin-bottom:18px}
+.pg h3{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+
+/* formuláře / modaly */
+.ov{position:fixed;inset:0;background:rgba(25,18,10,.5);backdrop-filter:blur(3px);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
+.modal{background:var(--card);border-radius:14px;width:min(700px,100%);padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.modal h2.mt{font-size:23px;text-transform:none;letter-spacing:0;color:var(--ink);margin-bottom:14px;font-weight:600}
+.f{display:grid;gap:13px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+label.fl{display:grid;gap:5px;font-size:12.5px;font-weight:700;color:var(--mut)}
+input[type=text],input[type=date],input[type=time],input[type=number],input[type=password],select,textarea{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-weight:400}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
+textarea{min-height:90px;resize:vertical}
+input[type=range]{accent-color:var(--acc)}
+input[type=checkbox]{accent-color:var(--acc);width:17px;height:17px}
+.chkrow{display:flex;gap:8px;align-items:center;font-weight:600}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pills label{cursor:pointer;position:relative}
+.pills input{position:absolute;opacity:0;pointer-events:none}
+.pills span{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:44px;padding:0 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font-size:22px}
+.pills input:checked+span{border-color:var(--acc);background:var(--accs);transform:scale(1.06)}
+.pv{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--bg)}
+.pv.off{opacity:.45}.pv[data-kind=task] .wk-only,.pv[data-kind=workout] .tk-only{display:none}
+.prow{display:grid;grid-template-columns:42px 1fr 1.4fr 38px;gap:8px;align-items:center;margin-bottom:8px}
+.prow input[type=color]{width:42px;height:38px;padding:2px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg)}
+details{border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--bg)}
+summary{cursor:pointer;font-weight:600}
+.goal .bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.goal .bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.grid2 .card+.card{margin-top:0}
+.tpl{display:grid;grid-template-columns:70px 1fr;gap:6px 12px;align-items:start}
+.tpl .dn{font-weight:700;color:var(--mut);padding-top:10px;font-size:13px}
+
+/* přehled */
+.bars{display:flex;gap:12px;align-items:flex-end;height:210px;padding-top:10px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:5px;font-size:11.5px;color:var(--mut)}
+.bar .stack{width:72%;max-width:56px;display:flex;flex-direction:column-reverse;border-radius:10px;overflow:hidden;min-height:3px;background:var(--line)}
+.bar .stack i{display:block}
+.bar.cur b{color:var(--acc)}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+table.t th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+
+#toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%) translateY(10px);background:#2b2520;color:#fff;padding:11px 18px;border-radius:14px;z-index:90;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* =====================  KONSTANTY A POMŮCKY  ===================== */
+const LS_KEY='planner.v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+const pad=n=>String(n).padStart(2,'0');
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const num=v=>{if(v===''||v==null)return null;const n=parseFloat(String(v).replace(',','.').replace(/[^\d.\-]/g,''));return isNaN(n)?null:n};
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const avg=a=>a.length?sum(a)/a.length:null;
+const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const r1=n=>Math.round(n*10)/10;
+
+const SPORTS={
+  run:{n:'Běh',i:'🏃‍♀️',c:'#d9593f'},
+  bike:{n:'Kolo',i:'🚴‍♀️',c:'#d9971f'},
+  swim:{n:'Plavání',i:'🏊‍♀️',c:'#2a8bc2'},
+  strength:{n:'Síla',i:'🏋️‍♀️',c:'#7a52c9'},
+  mobility:{n:'Mobilita / jóga',i:'🧘‍♀️',c:'#2f9c85'},
+  walk:{n:'Chůze / turistika',i:'🥾',c:'#8c7a4f'},
+  other:{n:'Jiné',i:'⚡',c:'#6b7a8f'}
+};
+const FEELS=['😫','😕','😐','🙂','💪'];
+const DAYS=['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'];
+const DAYS_S=['Po','Út','St','Čt','Pá','So','Ne'];
+const MONTHS=['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
+const COLORS=['#2f6b57','#c9604a','#7a3b69','#c28a1e','#1f6f9c','#b0486f','#5a7d2a','#6b5ca5'];
+const THEMES=[['graphite','#9aa0a8'],['forest','#2f6b57'],['plum','#7a3b69'],['coral','#cf4f38'],['ocean','#1f6f9c']];
+const PRIO=['','Vysoká','Střední','Nízká'];
+
+/* datumy – vždy lokální řetězce YYYY-MM-DD */
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const pd=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=pd(s);d.setDate(d.getDate()+n);return ymd(d)};
+const today=()=>ymd(new Date());
+const dow=s=>(pd(s).getDay()+6)%7;
+const mondayOf=s=>addDays(s,-dow(s));
+const fmtDay=s=>{const d=pd(s);return `${d.getDate()}. ${d.getMonth()+1}.`};
+const weekDays=ws=>Array.from({length:7},(_,i)=>addDays(ws,i));
+const isIso=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'');
+const byTime=(a,b)=>(a.time||'99').localeCompare(b.time||'99');
+const byPrio=(a,b)=>(a.prio||2)-(b.prio||2)||(a.due||'9').localeCompare(b.due||'9');
+const mins=(a,b)=>{if(!a||!b)return 0;const [h1,m1]=a.split(':').map(Number),[h2,m2]=b.split(':').map(Number);return Math.max(0,(h2*60+m2)-(h1*60+m1))};
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),3400)}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type||'text/plain'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+
+/* =====================  STAV A UKLÁDÁNÍ  ===================== */
+function defaults(){
+  return{v:1,
+    settings:{name:'',theme:'graphite',coachProfile:'',autoTemplate:true,workHours:6,kcalGoal:null,proteinGoal:null,gcalClientId:'',lastBackup:null},
+    goals:[],workouts:[],template:[],generatedWeeks:[],
+    projects:[{id:uid(),name:'Práce',color:COLORS[0],keywords:[]},{id:uid(),name:'Osobní',color:COLORS[1],keywords:[]}],
+    tasks:[],events:[],eventsU:0,tomb:{},nutrition:{},wellness:{}};
+}
+function load(){
+  const d=defaults();
+  try{const r=localStorage.getItem(LS_KEY);if(r){const p=JSON.parse(r);Object.assign(d,p);d.settings=Object.assign(defaults().settings,p.settings||{})}}catch(e){}
+  return d;
+}
+let S=load();
+/* save() je definováno v bloku synchronizace */
+
+const proj=id=>S.projects.find(p=>p.id===id);
+const goal=id=>S.goals.find(g=>g.id===id);
+const wkById=id=>S.workouts.find(w=>w.id===id);
+const tkById=id=>S.tasks.find(t=>t.id===id);
+const colorFor=()=>COLORS[S.projects.length%COLORS.length];
+
+/* týdenní šablona -> konkrétní tréninky */
+function genFromTemplate(ws){
+  let n=0;
+  for(const t of S.template){
+    const date=addDays(ws,t.dow);
+    if(S.workouts.some(w=>w.date===date&&(w.tplId===t.id||w.sport===t.sport)))continue;
+    S.workouts.push({id:'tpl-'+t.id+'-'+date,date,time:t.time||'',sport:t.sport,title:t.title,description:t.description||'',durMin:t.durMin||null,distKm:t.distKm||null,intensity:t.intensity||'',goalId:t.goalId||'',done:false,tplId:t.id});
+    n++;
+  }
+  return n;
+}
+function ensureWeek(ws){
+  if(!S.settings.autoTemplate||!S.template.length)return;
+  if(ws<mondayOf(today())||S.generatedWeeks.includes(ws))return;
+  genFromTemplate(ws);S.generatedWeeks.push(ws);save();
+}
+
+/* statistiky */
+function weekStats(ws){
+  const end=addDays(ws,6);
+  const w=S.workouts.filter(x=>x.date>=ws&&x.date<=end),done=w.filter(x=>x.done);
+  const bySport={};done.forEach(x=>{bySport[x.sport]=(bySport[x.sport]||0)+(x.aDur||x.durMin||0)});
+  const tk=S.tasks.filter(x=>x.date&&x.date>=ws&&x.date<=end);
+  return{planned:w.length,done:done.length,planMin:sum(w.map(x=>x.durMin||x.aDur||0)),doneMin:sum(done.map(x=>x.aDur||x.durMin||0)),
+    bySport,feel:avg(done.map(x=>x.feel).filter(Boolean)),rpe:avg(done.map(x=>x.rpe).filter(x=>x!=null)),
+    km:sum(done.map(x=>x.aDist||0)),tasks:tk.length,tasksDone:tk.filter(x=>x.done).length};
+}
+
+/* =====================  CHYTRÉ ZPRACOVÁNÍ ÚKOLŮ (diktát)  ===================== */
+const WDN='(?:v\\s+|ve\\s+|na\\s+|do\\s+)?(?:pondělí|úterý|středu|středa|čtvrtek|pátek|sobotu|sobota|neděli|neděle)(?![A-Za-zÀ-ž])';
+const SPLIT=new RegExp('\\n+|;|(?<=[A-Za-zÀ-ž][.!?])\\s+|,\\s*(?='+WDN+')|\\s+a\\s+(?='+WDN+')|\\s+a\\s+(?:pak|potom|poté|dále|dál|taky|také|ještě)\\s+|\\s+(?:pak|potom|poté|dále)\\s+|\\s+a\\s+(?=(?:musím|potřebuju|potřebuji|mám|chci|měla bych)\\s)|\\s+(?=(?:musím|potřebuju|potřebuji|měla bych|nezapomenout)\\s)','i');
+const SPLIT_W=new RegExp('\\n+|;|(?<=[A-Za-zÀ-ž][.!?])\\s+|,\\s*(?='+WDN+')|\\s+a\\s+(?='+WDN+')','i');
+const FILLER=/^(?:a\s+|ale\s+)?(?:(?:ještě|taky|také|dále|dál|pak|potom|poté|prosím|určitě|hlavně|tak)\s+)*(?:(?:musím|musela bych|potřebuju|potřebuji|chci|mám|měla bych|bych měla|je třeba|je potřeba|nezapomenout|nezapomeň)\s+)*/i;
+const BULLET=/^\s*(?:[-–•*]+|\d{1,2}[.)](?!\s*\d{1,2}\.))\s*/;
+const HI=/\b(urgentn\w*|nalehav\w*|ihned|hned|asap|co nejdriv|nejdriv|kritick\w*|dulezit\w*|priorit\w*|hori|nutne|bezpodminecne|deadline|musi byt|prvni vec)\b/;
+const LO=/\b(nekdy|az bude cas|kdyz bude cas|nespech\w*|volitelne|pripadne|casem|az nekdy|nice to have|nizka priorita)\b/;
+const WD={pondeli:0,pondelku:0,utery:1,uterku:1,streda:2,stredu:2,ctvrtek:3,ctvrtku:3,patek:4,patku:4,sobota:5,sobotu:5,nedele:6,nedeli:6};
+const STOP=new Set(['zavolat','poslat','udelat','pripravit','objednat','nezapomenout','ohledne','tento','tydne','pristi','dokoncit','zkontrolovat','domluvit','vyresit','napsat','odpovedet','zaridit','prosim','potom','jeste']);
+
+function nextDow(from,idx){let d=from;for(let i=0;i<7;i++){if(dow(d)===idx)return d;d=addDays(d,1)}return from}
+function findDate(n,base){
+  let m;
+  const withDo=i=>{const pm=/\bdo\s*$/.exec(n.slice(0,i));return pm?pm.index:null};
+  const re=/\b(\d{1,2})\.\s?(\d{1,2})\.?(?:\s?(20\d{2}))?(?!\d)/g;
+  while((m=re.exec(n))){
+    const dd=+m[1],mm=+m[2];if(mm<1||mm>12||dd<1||dd>31)continue;
+    const y=m[3]?+m[3]:pd(base).getFullYear();
+    let iso=`${y}-${pad(mm)}-${pad(dd)}`;
+    if(!m[3]&&iso<addDays(base,-60))iso=`${y+1}-${pad(mm)}-${pad(dd)}`;
+    const w=withDo(m.index);
+    return{iso,dl:w!==null,s:w!==null?w:m.index,e:m.index+m[0].length};
+  }
+  if((m=/\bpozitri\b/.exec(n)))return{iso:addDays(base,2),dl:false,s:m.index,e:m.index+m[0].length};
+  if((m=/\bzitr(?:a|ka|ek)\b/.exec(n))){const w=withDo(m.index);return{iso:addDays(base,1),dl:w!==null,s:w!==null?w:m.index,e:m.index+m[0].length}}
+  if((m=/\b(?:dnes|dneska|dnesni)\b/.exec(n))){const w=withDo(m.index);return{iso:base,dl:w!==null,s:w!==null?w:m.index,e:m.index+m[0].length}}
+  if((m=/\bdo\s+konce\s+tydne\b/.exec(n))){const f=addDays(mondayOf(base),4);return{iso:f<base?base:f,dl:true,s:m.index,e:m.index+m[0].length}}
+  if((m=/\b(?:na\s+)?pristi\s+tyden\b|\bpristiho\s+tydne\b|\bpristim\s+tydnu\b/.exec(n)))return{iso:addDays(mondayOf(base),11),dl:true,s:m.index,e:m.index+m[0].length};
+  const wre=/\b(?:(do|v|ve|na|o)\s+)?(pondeli|pondelku|utery|uterku|streda|stredu|ctvrtek|ctvrtku|patek|patku|sobota|sobotu|nedele|nedeli)\b/;
+  if((m=wre.exec(n)))return{iso:nextDow(base,WD[m[2]]),dl:m[1]==='do',s:m.index,e:m.index+m[0].length};
+  return null;
+}
+function scoreProject(n,p){
+  let s=0,w='';
+  const kws=[p.name,...(p.keywords||[])].map(norm).map(k=>k.trim()).filter(k=>k.length>=3);
+  for(const k of kws){
+    if(new RegExp('(^|[^a-z0-9])'+escRe(k)).test(n)){const sc=k===norm(p.name).trim()?3:2;if(sc>s){s=sc;w=k}}
+  }
+  return{s,w};
+}
+function guessEst(n){
+  if(/\b(zavolat|volat|telefon|mail|email|odpovedet|schvalit|podepsat|poslat)\b/.test(n))return 15;
+  if(/\b(porada|schuzk\w*|meeting|call|jednani)\b/.test(n))return 60;
+  if(/\b(priprav\w*|prezentac\w*|report|analyz\w*|navrh|zprav\w*|nabidk\w*|rozpocet|strategi\w*|plan)\b/.test(n))return 90;
+  return 30;
+}
+function splitItems(text,mode){
+  const rx=mode==='workout'?SPLIT_W:SPLIT;
+  const out=[];
+  text.replace(/\r/g,'\n').split(/\n+/).forEach(line=>{
+    line.split(rx).forEach((s,i)=>{
+      const t=(s||'').replace(BULLET,'').trim();
+      if(t.length>2)out.push({t,ls:i===0});   /* ls = začátek nového řádku */
+    });
+  });
+  return out;
+}
+/* text vypadá jako pokračování popisu tréninku (rozklus, 6x800 m, 30 min Z2…) */
+const startsCont=n=>/^(?:rozklus|vyklus|rozcvick|vybeh|\d+\s?x\s?\d|\d+\s*(?:min|km|h|hod)|z\s?[1-5](?![0-9])|zona|zone|pak\b|potom|serie|opakovani|pauza|odpocinek)/.test(n);
+/* ---- rozpoznávání tréninků ---- */
+const SPORT_RX=[
+  ['run',/\b(?:beh|behu|behy|behat|behani|bezet|bezim|bezela|bezec\w*|jogging|klus\w*|fartlek|tempovk\w*|interval\w*|parkrun)\b/],
+  ['bike',/\b(?:kolo|kole|kolem|cyklo\w*|cyklist\w*|spinning|trenazer\w*|bike)\b/],
+  ['swim',/\b(?:plav\w*|bazen\w*|kraul)\b/],
+  ['strength',/\b(?:posil\w*|silov\w*|sila|sile|gym|drep\w*|kettlebell\w*|crossfit|hiit|bricho)\b/],
+  ['mobility',/\b(?:joga|jogy|jogu|yoga|mobilit\w*|protaz\w*|stretch\w*|pilates|rolov\w*)\b/],
+  ['walk',/\b(?:chuz\w*|prochaz\w*|turist\w*|hike|hiking|vylet\w*|trek\w*)\b/]
+];
+const TASK_VERBS=/\b(?:koupit|nakoupit|objednat|opravit|zavolat|poslat|vyzvednout|zaplatit|napsat|domluvit|zarezervovat|odpovedet|schvalit|podepsat|vyridit|zkontrolovat)\b/;
+function findDuration(n){
+  let m;
+  const R=(min)=>({min,s:m.index,e:m.index+m[0].length});
+  if((m=/(?<!\b(?:v|ve|od|do|na|k)\s)\b(\d{1,2})\s*(?:h|hod\w*)\s*(?:a\s*)?(\d{1,2})\s*(?:min\w*)?/.exec(n)))return R(+m[1]*60+ +m[2]);
+  if((m=/\b(\d{1,2})[:.](\d{2})\s*(?:h|hod\w*)(?![a-z])/.exec(n)))return R(+m[1]*60+ +m[2]);
+  if((m=/(?<!\b(?:v|ve|od|do|na|k)\s)\b(\d{1,2}(?:[.,]\d)?)\s*(?:h|hod\w*)(?![a-z])/.exec(n)))return R(Math.round(parseFloat(m[1].replace(',','.'))*60));
+  if((m=/\b(\d{1,3})\s*(?:min\w*)(?![a-z])/.exec(n)))return R(+m[1]);
+  if((m=/\bhodin(?:u|ku)\s+a\s+pul\b/.exec(n)))return R(90);
+  if((m=/\bpul\s*hodin\w*/.exec(n)))return R(30);
+  if((m=/\bhodin(?:u|ku|ka)\b/.exec(n)))return R(60);
+  return null;
+}
+function findDist(n){
+  let m;
+  if((m=/(?<![\d:.,])(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:km|kilometr\w*|kilak\w*)(?![a-z])/.exec(n)))return{km:parseFloat(m[1].replace(',','.')),s:m.index,e:m.index+m[0].length};
+  if((m=/(?<![\d:.,])(\d{1,2})\s?k(?![a-z])/.exec(n)))return{km:+m[1],s:m.index,e:m.index+m[0].length};
+  return null;
+}
+function findIntensity(n){
+  const parts=[];
+  const kws=[['intervaly',/\binterval\w*/],['tempo',/\btempo\b|\btempov\w*/],['dlouhý',/\bdlouh\w*/],['klidně',/\bklidn\w*|\bpomal\w*|\blehk\w*|\bvolne\w*/],['regenerace',/\bregener\w*/],['kopce',/\bkopc\w*|\bkopec/],['sprinty',/\bsprint\w*/]];
+  for(const [l,rx] of kws){if(rx.test(n)){parts.push(l);break}}
+  const z=/\b(?:z|zona|zony|zone)\s?([1-5])(?![0-9])/.exec(n);
+  if(z)parts.push('Z'+z[1]);
+  return parts.join(' ');
+}
+function detectWorkout(n,forced){
+  let sport=null,word=false;
+  for(const [k,rx] of SPORT_RX){if(rx.test(n)){sport=k;word=true;break}}
+  const gen=/\b(?:trenink\w*|trenovat|trenuju|trenovala|cviceni|cvicit|workout|sportov\w*)\b/.test(n);
+  const dur=findDuration(n),dist=findDist(n),inten=findIntensity(n);
+  const zone=/\b(?:z|zona|zony|zone)\s?[1-5](?![0-9])/.test(n);
+  let score=(word?2:0)+(gen?2:0)+(dist?2:0)+(zone?2:0);
+  if(score>0&&dur)score+=1;
+  if(TASK_VERBS.test(n)&&!dist&&!gen)score-=3;
+  if(!forced&&score<2)return null;
+  if(!sport)sport=dist?'run':'other';
+  return{sport,weak:!word,dur:dur?dur.min:null,distKm:dist?dist.km:null,intensity:inten,
+    cuts:[dur&&[dur.s,dur.e],dist&&[dist.s,dist.e]].filter(Boolean)};
+}
+/* přidá/aktualizuje trénink; šablonový trénink stejného sportu ve stejný den nahradí */
+function addWorkoutItem(f){
+  const date=f.date||today();
+  const sp=SPORTS[f.sport]?f.sport:'other';
+  const fields={date,time:f.time||'',sport:sp,title:f.title||SPORTS[sp].n,description:f.desc||'',durMin:f.durMin||null,distKm:f.distKm||null,intensity:f.intensity||''};
+  const ex=S.workouts.find(w=>w.date===date&&!w.done&&(norm(w.title)===norm(fields.title)||(w.tplId&&w.sport===sp)));
+  if(ex){Object.assign(ex,fields);return'upd'}
+  S.workouts.push(Object.assign({id:uid(),done:false,goalId:''},fields));
+  return'new';
+}
+/* hlavní vyhodnocení textu: úkoly i tréninky */
+function parseDictation(text,mode){
+  mode=mode||'auto';
+  const base=today(),out=[];
+  const ABBR=['po','ut','st','ct','pa','so','ne'];
+  splitItems(text,mode).forEach(({t:raw,ls})=>{
+    const s=raw.replace(FILLER,'').trim();
+    if(s.length<2)return;
+    const n=norm(s),cuts=[],why=[];
+    let due='',date='',time='';
+    const ab=/^(po|ut|st|ct|pa|so|ne)\s*[:\-–]\s*/.exec(n);
+    if(ab){date=due=nextDow(base,ABBR.indexOf(ab[1]));cuts.push([0,ab[0].length]);why.push('den '+fmtDay(date))}
+    if(!date){
+      const fd=findDate(n,base);
+      if(fd){if(fd.dl)due=fd.iso;else date=due=fd.iso;cuts.push([fd.s,fd.e]);why.push((fd.dl?'termín ':'den ')+fmtDay(fd.iso))}
+    }
+    const tm=/\b(?:v|ve|od|na|k)\s*(\d{1,2}):(\d{2})\b/.exec(n)||/\b(?:v|ve|od)\s*(\d{1,2})\s*(?:hod\w*|h)(?![a-z])/.exec(n);
+    if(tm&&+tm[1]<24){time=`${pad(tm[1])}:${tm[2]||'00'}`;cuts.push([tm.index,tm.index+tm[0].length]);why.push('čas '+time)}
+    const cut=arr=>{
+      if(n.length!==s.length)return s;
+      let t=s;
+      arr.slice().sort((a,b)=>b[0]-a[0]).forEach(([a,b])=>{t=t.slice(0,a)+' '+t.slice(b)});
+      return t;
+    };
+    const clean=t=>{
+      t=t.replace(/\s+/g,' ').replace(/\s+([,.;:!?])/g,'$1').replace(/^[\s,.\-–:]+|[\s,.\-–:]+$/g,'');
+      t=t.replace(/\s+(?:do|na|v|ve|o|k|od)$/i,'').replace(/^(?:na|v|ve|o)\s+/i,'').replace(/^[\s,.\-–:]+|[\s,.\-–:]+$/g,'');
+      return t.charAt(0).toUpperCase()+t.slice(1);
+    };
+    /* --- trénink? --- */
+    const wk=mode==='task'?null:detectWorkout(n,mode==='workout');
+    if(wk){
+      const sp=SPORTS[wk.sport];
+      const t=clean(cut(cuts.concat(wk.cuts)));
+      const title=t&&norm(t).length>2?t:(sp.n+(wk.intensity?' '+wk.intensity:''));
+      const w={kind:'workout',title,sport:wk.sport,date,time,durMin:wk.dur,distKm:wk.distKm,intensity:wk.intensity,
+        desc:s.length>title.length+10?s:'',weak:wk.weak,hasDate:!!date,why:['trénink: '+sp.n]};
+      if(wk.dur)w.why.push(wk.dur+' min');
+      if(wk.distKm)w.why.push(wk.distKm+' km');
+      if(wk.intensity)w.why.push(wk.intensity);
+      if(date)w.why.push('den '+fmtDay(date));
+      const prev=out[out.length-1];
+      if(mode==='auto'&&w.weak&&!date&&prev&&prev.kind==='workout'&&(!ls||startsCont(n))){
+        prev.desc=(prev.desc||prev.title)+'\n'+s;
+        if(w.durMin)prev.durMin=(prev.durMin||0)+w.durMin;
+        if(!prev.distKm&&w.distKm)prev.distKm=w.distKm;
+        if(!prev.intensity&&w.intensity)prev.intensity=w.intensity;
+        return;
+      }
+      out.push(w);
+      return;
+    }
+    /* --- pokračování popisu předchozího tréninku (rozklus, 30 min Z2, 6x800 m…) --- */
+    const prevW=out[out.length-1];
+    if(mode==='auto'&&prevW&&prevW.kind==='workout'&&!date&&!TASK_VERBS.test(n)&&(!ls||startsCont(n))){
+      const du0=findDuration(n);
+      if(du0||/\b(?:z|zona|zone)\s?[1-5](?![0-9])/.test(n)||/\b(?:rozklus\w*|vyklus\w*|rozcvick\w*|vybeh\w*|\d+\s?x\s?\d+|serie|opakovani|odpocinek|pauza|zatim)\b/.test(n)){
+        prevW.desc=(prevW.desc||prevW.title)+'\n'+s;
+        if(du0)prevW.durMin=(prevW.durMin||0)+du0.min;
+        const dd=findDist(n);if(!prevW.distKm&&dd)prevW.distKm=dd.km;
+        const ii=findIntensity(n);if(!prevW.intensity&&ii)prevW.intensity=ii;
+        return;
+      }
+    }
+    /* --- úkol --- */
+    const duT=findDuration(n);
+    if(duT)cuts.push([duT.s,duT.e]);
+    const title=clean(cut(cuts));
+    if(!title)return;
+    let prio=2;
+    const hi=HI.exec(n),lo=LO.exec(n);
+    if(hi){prio=1;why.push('priorita vysoká („'+hi[0]+'“)')}
+    else if(lo){prio=3;why.push('priorita nízká („'+lo[0]+'“)')}
+    else if(due&&due<=addDays(base,2)){prio=1;why.push('termín do 2 dnů → vysoká')}
+    let best=null,bs=0,bw='';
+    S.projects.forEach(p=>{const r=scoreProject(n,p);if(r.s>bs){bs=r.s;best=p;bw=r.w}});
+    if(best)why.push('projekt '+best.name+' („'+bw+'“)');
+    if(duT)why.push('odhad '+duT.min+' min');
+    out.push({kind:'task',title,projectId:best?best.id:'',sugg:best?best.id:'',prio,due,date,time,est:duT?duT.min:guessEst(n),why,notes:''});
+  });
+  return out;
+}
+
+/* aplikace se učí: když přeřadíš úkol do jiného projektu, zapamatuje si slova z názvu */
+function learn(title,projectId){
+  const p=proj(projectId);if(!p)return[];
+  const words=norm(title).split(/[^a-z0-9]+/).filter(w=>w.length>=5&&!STOP.has(w)).sort((a,b)=>b.length-a.length).slice(0,3);
+  const added=[];
+  words.forEach(w=>{
+    const stem=w.slice(0,Math.max(5,w.length-2));
+    p.keywords=p.keywords||[];
+    if(!p.keywords.some(k=>norm(k).startsWith(stem)||stem.startsWith(norm(k)))){p.keywords.push(stem);added.push(stem)}
+  });
+  return added;
+}
+/* inteligentní rozvržení úkolů do dnů týdne podle priorit, termínů a kapacity */
+function autoSchedule(ws){
+  const t=today();
+  const wd=weekDays(ws).slice(0,5);
+  const days=wd.filter(d=>d>=t);
+  const usable=days.length?days:wd;
+  const last=usable[usable.length-1];
+  const cap={};
+  usable.forEach(d=>{
+    const used=sum(S.events.filter(e=>e.date===d&&e.time&&e.endTime).map(e=>mins(e.time,e.endTime)));
+    const planned=sum(S.tasks.filter(x=>!x.done&&x.date===d).map(x=>x.est||30));
+    cap[d]=S.settings.workHours*60-used-planned;
+  });
+  const todo=S.tasks.filter(x=>!x.done&&!x.date).sort((a,b)=>a.prio-b.prio||(a.due||'9').localeCompare(b.due||'9'));
+  let n=0;
+  todo.forEach(x=>{
+    if(x.due&&x.due>last&&x.prio>1)return;
+    const elig=usable.filter(d=>!x.due||d<=x.due);
+    const pool=elig.length?elig:[usable[0]];
+    const est=x.est||30;
+    let d=pool.find(dd=>cap[dd]>=est);
+    if(!d){if(x.prio===3)return;d=pool.slice().sort((a,b)=>cap[b]-cap[a])[0]}
+    x.date=d;cap[d]-=est;n++;
+  });
+  save();
+  return n;
+}
+
+/* =====================  IMPORTY  ===================== */
+function sportId(s){
+  const n=norm(s||'');
+  if(SPORTS[n])return n;
+  if(/beh|run|jog/.test(n))return'run';
+  if(/kolo|cykl|bik|cycl|ride/.test(n))return'bike';
+  if(/plav|swim/.test(n))return'swim';
+  if(/sil|posil|strength|gym|weight|cross/.test(n))return'strength';
+  if(/yoga|joga|mobil|pilates|stretch|strech/.test(n))return'mobility';
+  if(/chuz|walk|hik|turist|tour/.test(n))return'walk';
+  return'other';
+}
+function toIso(s){
+  s=String(s||'').trim();
+  let m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return`${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+  m=s.match(/(\d{1,2})\.\s?(\d{1,2})\.\s?(\d{4})/);if(m)return`${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  m=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return`${m[3]}-${pad(m[1])}-${pad(m[2])}`;
+  return null;
+}
+function parseDur(v,hm){
+  v=String(v||'').trim();if(!v)return null;
+  const m=v.match(/^(\d+):(\d{2})(?::(\d{2}))?$/);
+  if(m){
+    if(m[3]!==undefined)return Math.round(+m[1]*60+ +m[2]+ +m[3]/60);
+    return hm?Math.round(+m[1]*60+ +m[2]):Math.round(+m[1]+ +m[2]/60);
+  }
+  return num(v);
+}
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,'');
+  const first=text.split('\n')[0];
+  const delim=[',',';','\t'].sort((a,b)=>(first.split(b).length)-(first.split(a).length))[0];
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===delim){row.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);f='';if(row.some(x=>x!==''))rows.push(row);row=[]}
+    else f+=c;
+  }
+  row.push(f);if(row.some(x=>x!==''))rows.push(row);
+  return rows;
+}
+function colIdx(h,pats){
+  for(const p of pats){const i=h.indexOf(p);if(i>=0)return i}
+  for(const p of pats){const i=h.findIndex(x=>x.startsWith(p));if(i>=0)return i}
+  for(const p of pats){const i=h.findIndex(x=>x.includes(p));if(i>=0)return i}
+  return -1;
+}
+
+/* Garmin aktivity: spárování s plánem */
+function matchActivities(acts){
+  const used=new Set();
+  return acts.map(a=>{
+    const dup=S.workouts.some(w=>(w.ext&&w.ext===a.key)||(w.done&&String(w.ext||'').startsWith('strava:')&&w.date===a.date&&w.sport===a.sport&&w.aDur&&a.durMin&&Math.abs(w.aDur-a.durMin)<=Math.max(5,a.durMin*0.15)));
+    let m=null;
+    if(!dup)m=S.workouts.find(w=>!w.done&&!used.has(w.id)&&w.date===a.date&&w.sport===a.sport)||null;
+    if(m)used.add(m.id);
+    return{a,dup,m};
+  });
+}
+function applyActivities(pairs){
+  let matched=0,added=0;
+  pairs.forEach(({a,dup,m})=>{
+    if(dup)return;
+    const fields={done:true,aDur:a.durMin,aDist:a.distKm,aHr:a.hr,aMaxHr:a.maxHr,source:'Garmin',ext:a.key};
+    if(m){Object.assign(m,fields);matched++}
+    else{S.workouts.push(Object.assign({id:uid(),date:a.date,time:a.time||'',sport:a.sport,title:a.title||SPORTS[a.sport].n,description:'',durMin:null,distKm:null,intensity:'',goalId:'',notes:''},fields));added++}
+  });
+  save();render();
+  toast(`Garmin: ${matched}× spárováno s plánem, ${added}× přidáno jako nový trénink`);
+}
+
+function importCSV(text){
+  const rows=parseCSV(text);
+  if(rows.length<2){toast('V souboru nejsou žádná data.');return}
+  const head=rows[0].map(h=>norm(h).trim()),body=rows.slice(1);
+  const C=(...p)=>colIdx(head,p);
+  const iDate=C('datum','date','den','day');
+  if(iDate<0){toast('Nenašla jsem sloupec s datem (Datum / Date).');return}
+  const iType=C('typ aktivity','activity type');
+  if(iType>=0){
+    const iTitle=C('nazev','title'),iDist=C('vzdalenost','distance'),iTime=C('cas','time','doba');
+    const iHr=C('prum. tf','prumerna tf','avg hr','prum. srdecni','average heart');
+    const iMax=C('maximalni tf','max. tf','max hr','max tf','maximum heart');
+    const acts=body.map(r=>{
+      const date=toIso(r[iDate]);if(!date)return null;
+      const sport=sportId(r[iType]);
+      let dist=iDist>=0?num(r[iDist]):null;
+      if(sport==='swim'&&dist!=null&&dist>=50)dist=dist/1000;
+      const tm=String(r[iDate]).match(/(\d{1,2}):(\d{2})/);
+      const time=tm?`${pad(tm[1])}:${tm[2]}`:'';
+      return{date,time,sport,title:iTitle>=0?r[iTitle]:'',durMin:iTime>=0?parseDur(r[iTime],false):null,distKm:dist!=null?r1(dist*100)/100:null,
+        hr:iHr>=0?num(r[iHr]):null,maxHr:iMax>=0?num(r[iMax]):null,key:`g:${date}T${time}:${sport}`};
+    }).filter(Boolean);
+    if(!acts.length){toast('Nepodařilo se přečíst žádnou aktivitu.');return}
+    previewActivities(acts,'CSV');
+    return;
+  }
+  const iK=C('kcal','kalori','calor','energ');
+  if(iK>=0){
+    const iP=C('bilkovin','protein'),iS=C('sacharid','carb'),iF=C('tuk','fat');
+    const kf=(head[iK].includes('kj')&&!head[iK].includes('kcal'))?1/4.184:1;
+    const out={};
+    body.forEach(r=>{
+      const d=toIso(r[iDate]);if(!d)return;
+      const o=out[d]||(out[d]={kcal:0,protein:0,carbs:0,fat:0});
+      o.kcal=Math.round(o.kcal+(num(r[iK])||0)*kf);if(iP>=0)o.protein+=num(r[iP])||0;if(iS>=0)o.carbs+=num(r[iS])||0;if(iF>=0)o.fat+=num(r[iF])||0;
+    });
+    const days=Object.keys(out).sort();
+    if(!days.length){toast('Nepodařilo se přečíst žádné dny.');return}
+    pend={apply:()=>{days.forEach(d=>{S.nutrition[d]=Object.assign(S.nutrition[d]||{},out[d])});save();render();toast(`Strava: načteno ${days.length} dnů`)}};
+    openModal(`<h2 class="mt">🥗 Import stravy</h2><p>Nalezeno <b>${days.length}</b> dnů (${fmtDay(days[0])} – ${fmtDay(days[days.length-1])}). Pokud je v deníku víc záznamů za den, sečtou se.</p>
+      <table class="t"><tr><th>Den</th><th>kcal</th><th>B</th><th>S</th><th>T</th></tr>${days.slice(-5).map(d=>`<tr><td>${fmtDay(d)}</td><td>${Math.round(out[d].kcal)}</td><td>${Math.round(out[d].protein)}</td><td>${Math.round(out[d].carbs)}</td><td>${Math.round(out[d].fat)}</td></tr>`).join('')}</table>
+      <div class="row" style="margin-top:14px"><button class="btn pri" data-act="applyPending">Importovat</button><button class="btn" data-act="closeModal">Zrušit</button></div>`);
+    return;
+  }
+  const iSt=C('kroky','steps'),iSl=C('spanek','sleep'),iR=C('klidov','resting'),iW=C('vaha','hmotnost','weight');
+  if(iSt<0&&iSl<0&&iR<0&&iW<0){toast('Neznám tento formát. Zkus Garmin „Aktivity“ CSV, nebo CSV se sloupci Datum + Kalorie.');return}
+  const out={};
+  body.forEach(r=>{
+    const d=toIso(r[iDate]);if(!d)return;
+    const o={};
+    if(iSt>=0){const v=num(r[iSt]);if(v!=null)o.steps=v}
+    if(iSl>=0){const v=parseDur(r[iSl],true);if(v!=null)o.sleepH=v>24?r1(v/60):v}
+    if(iR>=0){const v=num(r[iR]);if(v!=null)o.restingHr=v}
+    if(iW>=0){const v=num(r[iW]);if(v!=null)o.weightKg=v}
+    if(Object.keys(o).length)out[d]=o;
+  });
+  const days=Object.keys(out).sort();
+  if(!days.length){toast('Nepodařilo se přečíst žádné dny.');return}
+  pend={apply:()=>{days.forEach(d=>{S.wellness[d]=Object.assign(S.wellness[d]||{},out[d])});save();render();toast(`Zdraví: načteno ${days.length} dnů`)}};
+  openModal(`<h2 class="mt">💤 Import zdraví a spánku</h2><p>Nalezeno <b>${days.length}</b> dnů.</p><div class="row"><button class="btn pri" data-act="applyPending">Importovat</button><button class="btn" data-act="closeModal">Zrušit</button></div>`);
+}
+
+/* ICS (Google Kalendář export) */
+const ICSD=['MO','TU','WE','TH','FR','SA','SU'];
+const icsText=s=>String(s||'').replace(/\\n/gi,' ').replace(/\\([,;\\])/g,'$1');
+function icsDT(v){
+  const m=String(v).trim().match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?(Z)?)?$/);
+  if(!m)return null;
+  if(m[4]===undefined)return{date:`${m[1]}-${m[2]}-${m[3]}`,time:'',allDay:true};
+  if(m[7]){const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0)));return{date:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,allDay:false}}
+  return{date:`${m[1]}-${m[2]}-${m[3]}`,time:`${m[4]}:${m[5]}`,allDay:false};
+}
+function occDates(ev,from,to){
+  const s=ev.start.date;
+  if(!ev.rrule)return[s].filter(d=>d>=from&&d<=to);
+  const r=ev.rrule,iv=+(r.INTERVAL||1)||1,cnt=r.COUNT?+r.COUNT:Infinity;
+  const until=r.UNTIL?(icsDT(r.UNTIL)||{}).date:'';
+  const lim=until&&until<to?until:to;
+  const res=[];let n=0;
+  if(r.FREQ==='DAILY'){for(let d=s,i=0;i<4000&&d<=lim&&n<cnt;d=addDays(d,iv),i++){res.push(d);n++}}
+  else if(r.FREQ==='WEEKLY'){
+    const by=(r.BYDAY?r.BYDAY.split(','):[ICSD[dow(s)]]).map(x=>ICSD.indexOf(x.replace(/[-+\d]/g,''))).filter(i=>i>=0).sort((a,b)=>a-b);
+    let wk=mondayOf(s);
+    for(let i=0;i<1500&&wk<=lim&&n<cnt;wk=addDays(wk,7*iv),i++){
+      for(const b of by){const d=addDays(wk,b);if(d<s||d>lim)continue;if(n>=cnt)break;res.push(d);n++}
+    }
+  }else if(r.FREQ==='MONTHLY'||r.FREQ==='YEARLY'){
+    const step=r.FREQ==='YEARLY'?12*iv:iv,b=pd(s);
+    for(let i=0;i<600&&n<cnt;i++){
+      const d=new Date(b.getFullYear(),b.getMonth()+i*step,b.getDate());
+      if(d.getDate()!==b.getDate())continue;
+      const iso=ymd(d);if(iso>lim)break;res.push(iso);n++;
+    }
+  }else res.push(s);
+  return res.filter(d=>d>=from&&d<=to&&!ev.ex.has(d));
+}
+function parseICS(text){
+  const lines=text.replace(/\r/g,'').replace(/\n[ \t]/g,'').split('\n');
+  const evs=[];let cur=null;
+  for(const ln of lines){
+    if(ln==='BEGIN:VEVENT'){cur={ex:new Set()};continue}
+    if(ln==='END:VEVENT'){if(cur)evs.push(cur);cur=null;continue}
+    if(!cur)continue;
+    const i=ln.indexOf(':');if(i<0)continue;
+    const key=ln.slice(0,i).split(';')[0].toUpperCase(),val=ln.slice(i+1);
+    if(key==='UID')cur.uid=val;
+    else if(key==='SUMMARY')cur.title=icsText(val);
+    else if(key==='LOCATION')cur.loc=icsText(val);
+    else if(key==='STATUS')cur.status=val;
+    else if(key==='DTSTART')cur.start=icsDT(val);
+    else if(key==='DTEND')cur.end=icsDT(val);
+    else if(key==='RECURRENCE-ID')cur.recId=icsDT(val);
+    else if(key==='RRULE'){cur.rrule={};val.split(';').forEach(p=>{const [k,v]=p.split('=');cur.rrule[k]=v})}
+    else if(key==='EXDATE')val.split(',').forEach(v=>{const d=icsDT(v);if(d)cur.ex.add(d.date)});
+  }
+  const from=addDays(today(),-60),to=addDays(today(),365);
+  const masters={};
+  evs.forEach(e=>{if(e.uid&&!e.recId&&e.rrule)masters[e.uid]=e});
+  evs.forEach(e=>{if(e.recId&&masters[e.uid])masters[e.uid].ex.add(e.recId.date)});
+  const out=[];
+  evs.forEach(e=>{
+    if(!e.start||e.status==='CANCELLED')return;
+    const dates=occDates(e,from,to);
+    let span=1;
+    if(e.start.allDay&&e.end&&e.end.date>e.start.date)span=Math.min(14,Math.round((pd(e.end.date)-pd(e.start.date))/864e5));
+    dates.forEach(d=>{
+      for(let k=0;k<span;k++){
+        const dd=addDays(d,k);
+        out.push({id:`ics:${e.uid||uid()}:${dd}`,date:dd,time:e.start.allDay?'':e.start.time,endTime:(!e.start.allDay&&e.end&&e.end.date===e.start.date)?e.end.time:'',title:e.title||'(bez názvu)',loc:e.loc||'',allDay:e.start.allDay,source:'ics'});
+      }
+    });
+  });
+  return out;
+}
+function importICS(text){
+  const evs=parseICS(text);
+  if(!evs.length){toast('V souboru nejsou žádné události.');return}
+  S.events=S.events.filter(e=>e.source!=='ics').concat(evs);S.eventsU=Date.now();S.settings.lastCal=Date.now();
+  save();render();
+  toast(`Kalendář: načteno ${evs.length} událostí`);
+}
+
+/* JSON od ChatGPT / záloha */
+function extractJSON(text){
+  let t=text.trim();
+  const f=t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if(f)t=f[1].trim();
+  else{
+    const a=t.search(/[\[{]/);
+    const e=Math.max(t.lastIndexOf('}'),t.lastIndexOf(']'));
+    if(a>=0&&e>a)t=t.slice(a,e+1);
+  }
+  return JSON.parse(t);
+}
+function normalizeIncoming(o){
+  if(Array.isArray(o))o={workouts:o};
+  const arr=k=>Array.isArray(o[k])?o[k]:[];
+  const dt=v=>{const s=toIso(v);return s&&isIso(s)?s:''};
+  const inc={workouts:[],tasks:[],goals:[],projects:[],nutrition:[],wellness:[]};
+  arr('workouts').forEach(w=>{
+    const date=dt(w.date);if(!date)return;
+    const sp=sportId(w.sport||w.type);
+    inc.workouts.push({date,time:/^\d{1,2}:\d{2}$/.test(w.time||'')?w.time:'',sport:sp,title:String(w.title||w.name||SPORTS[sp].n),description:String(w.description||w.details||''),
+      durMin:num(w.durationMin??w.durMin??w.duration),distKm:num(w.distanceKm??w.distKm??w.distance),intensity:String(w.intensity||w.zone||''),goal:String(w.goal||'')});
+  });
+  arr('tasks').forEach(t=>{
+    if(!t.title)return;
+    inc.tasks.push({title:String(t.title),project:String(t.project||''),prio:[1,2,3].includes(+t.priority)?+t.priority:2,due:dt(t.due),date:dt(t.date),est:num(t.estimateMin??t.est),time:/^\d{1,2}:\d{2}$/.test(t.time||'')?t.time:'',notes:String(t.notes||'')});
+  });
+  arr('goals').forEach(g=>{if(g.title)inc.goals.push({title:String(g.title),sport:sportId(g.sport),target:String(g.target||''),deadline:dt(g.deadline),notes:String(g.notes||'')})});
+  arr('projects').forEach(p=>{if(p.name)inc.projects.push({name:String(p.name),keywords:Array.isArray(p.keywords)?p.keywords.map(String):[]})});
+  arr('nutrition').forEach(n=>{const d=dt(n.date);if(d)inc.nutrition.push({date:d,mode:n.mode==='add'?'add':'set',kcal:num(n.kcal),protein:num(n.protein),carbs:num(n.carbs),fat:num(n.fat)})});
+  arr('wellness').forEach(n=>{const d=dt(n.date);if(d)inc.wellness.push({date:d,steps:num(n.steps),sleepH:num(n.sleepH),restingHr:num(n.restingHr),weightKg:num(n.weightKg)})});
+  return inc;
+}
+function previewIncoming(inc,asTasks){
+  const tot=inc.workouts.length+inc.tasks.length+inc.goals.length+inc.projects.length+inc.nutrition.length+inc.wellness.length;
+  if(!tot){toast('V odpovědi jsem nenašla nic k importu.');return}
+  if(asTasks&&(inc.tasks.length||inc.workouts.length)&&!inc.goals.length){
+    openTaskPreview([
+      ...inc.tasks.map(t=>({kind:'task',title:t.title,projectId:'',projName:t.project,sugg:'',prio:t.prio,due:t.due,date:t.date,time:t.time,est:t.est||30,notes:t.notes,why:['od ChatGPT']})),
+      ...inc.workouts.map(w=>({kind:'workout',title:w.title,sport:w.sport,date:w.date,time:w.time,durMin:w.durMin,distKm:w.distKm,intensity:w.intensity,desc:w.description,prio:2,est:30,why:['od ChatGPT']}))
+    ]);
+    return;
+  }  const li=(a,f)=>a.length?`<details style="margin:6px 0"><summary>${a.length}×</summary>${a.slice(0,40).map(f).join('')}</details>`:'';
+  pend={apply:()=>applyIncoming(inc)};
+  openModal(`<h2 class="mt">📥 Co se naimportuje</h2>
+    ${inc.workouts.length?`<h3>Tréninky ${li(inc.workouts,w=>`<div class="small">${fmtDay(w.date)} ${SPORTS[w.sport].i} <b>${esc(w.title)}</b> ${w.durMin?w.durMin+' min':''} ${w.distKm?w.distKm+' km':''} ${esc(w.intensity)}</div>`)}</h3><p class="mut small">Šablonové tréninky v dotčených týdnech, které ještě nejsou splněné, se nahradí tímto plánem.</p>`:''}
+    ${inc.tasks.length?`<h3>Úkoly ${li(inc.tasks,t=>`<div class="small">• ${esc(t.title)} ${t.project?'<span class="mut">('+esc(t.project)+')</span>':''}</div>`)}</h3>`:''}
+    ${inc.goals.length?`<h3>Cíle ${li(inc.goals,g=>`<div class="small">🎯 ${esc(g.title)}</div>`)}</h3>`:''}
+    ${inc.projects.length?`<h3>Projekty ${li(inc.projects,p=>`<div class="small">${esc(p.name)}</div>`)}</h3>`:''}
+    ${inc.nutrition.length?`<h3>Strava: ${inc.nutrition.length} dnů</h3>`:''}
+    ${inc.wellness.length?`<h3>Zdraví: ${inc.wellness.length} dnů</h3>`:''}
+    <div class="row" style="margin-top:14px"><button class="btn pri" data-act="applyPending">Importovat</button><button class="btn" data-act="closeModal">Zrušit</button></div>`);
+}
+function projIdByName(name,rep){
+  if(!name)return'';
+  const k=norm(name).trim();
+  let p=S.projects.find(p=>norm(p.name).trim()===k);
+  if(!p){p={id:uid(),name:name.trim(),color:colorFor(),keywords:[]};S.projects.push(p);if(rep)rep.p++}
+  return p.id;
+}
+function applyIncoming(inc){
+  const rep={w:0,wu:0,t:0,g:0,p:0,n:0};
+  inc.projects.forEach(p=>{
+    const id=projIdByName(p.name,rep),pr=proj(id);
+    p.keywords.forEach(k=>{if(!pr.keywords.map(norm).includes(norm(k)))pr.keywords.push(k)});
+  });
+  inc.goals.forEach(g=>{
+    if(S.goals.some(x=>norm(x.title)===norm(g.title)))return;
+    S.goals.push({id:uid(),title:g.title,sport:g.sport,target:g.target,deadline:g.deadline,notes:g.notes,done:false});rep.g++;
+  });
+  const goalId=name=>{if(!name)return'';const n=norm(name);const g=S.goals.find(g=>norm(g.title)===n||norm(g.title).includes(n)||n.includes(norm(g.title)));return g?g.id:''};
+  if(inc.workouts.length){
+    const weeks=new Set(inc.workouts.map(w=>mondayOf(w.date)));
+    S.workouts=S.workouts.filter(w=>!(w.tplId&&!w.done&&weeks.has(mondayOf(w.date))));
+    weeks.forEach(k=>{if(!S.generatedWeeks.includes(k))S.generatedWeeks.push(k)});
+    inc.workouts.forEach(w=>{
+      const fields={date:w.date,time:w.time,sport:w.sport,title:w.title,description:w.description,durMin:w.durMin,distKm:w.distKm,intensity:w.intensity,goalId:goalId(w.goal)};
+      const ex=S.workouts.find(x=>x.date===w.date&&norm(x.title)===norm(w.title));
+      if(ex){if(!ex.done){Object.assign(ex,fields);rep.wu++}}
+      else{S.workouts.push(Object.assign({id:uid(),done:false},fields));rep.w++}
+    });
+  }
+  inc.tasks.forEach(t=>{
+    if(S.tasks.some(x=>!x.done&&norm(x.title)===norm(t.title)))return;
+    S.tasks.push({id:uid(),title:t.title,projectId:projIdByName(t.project,rep),prio:t.prio,due:t.due,date:t.date,time:t.time,est:t.est||30,notes:t.notes,done:false,created:Date.now()});rep.t++;
+  });
+  inc.nutrition.forEach(n=>{const o=S.nutrition[n.date]||(S.nutrition[n.date]={});['kcal','protein','carbs','fat'].forEach(k=>{if(n[k]!=null)o[k]=(n.mode==='add'?(o[k]||0):0)+n[k]});rep.n++});
+  inc.wellness.forEach(n=>{const o=S.wellness[n.date]||(S.wellness[n.date]={});['steps','sleepH','restingHr','weightKg'].forEach(k=>{if(n[k]!=null)o[k]=n[k]});rep.n++});
+  save();render();
+  toast(`Hotovo: ${rep.w} nových a ${rep.wu} upravených tréninků, ${rep.t} úkolů, ${rep.g} cílů`);
+}
+function handleText(text,name,asTasks){
+  const t=(text||'').trim();
+  if(!t){toast('Nic ke zpracování.');return}
+  if(/^BEGIN:VCALENDAR/i.test(t)||/\.ics$/i.test(name||''))return importICS(t);
+  if(/^[\[{]/.test(t)||/\.json$/i.test(name||'')||/```/.test(t)||/\{\s*"(workouts|tasks|goals|projects|nutrition|wellness|settings)"/.test(t)){
+    let o;
+    try{o=extractJSON(t)}catch(e){toast('JSON se nepodařilo přečíst: '+e.message);return}
+    if(o&&o.v&&o.settings&&Array.isArray(o.workouts)&&Array.isArray(o.tasks)){
+      pend={apply:()=>{S=Object.assign(defaults(),o);S.settings=Object.assign(defaults().settings,o.settings);save();applyTheme();render();toast('Záloha obnovena')}};
+      openModal(`<h2 class="mt">Obnovit ze zálohy?</h2><p>Záloha obsahuje ${o.workouts.length} tréninků a ${o.tasks.length} úkolů. <b>Aktuální data v aplikaci budou nahrazena.</b></p><div class="row"><button class="btn pri" data-act="applyPending">Obnovit</button><button class="btn" data-act="closeModal">Zrušit</button></div>`);
+      return;
+    }
+    return previewIncoming(normalizeIncoming(o),asTasks);
+  }
+  importCSV(t);
+}
+
+/* =====================  EXPORTY A PROMPTY PRO CHATGPT  ===================== */
+const icsEsc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+function exportICS(){
+  const from=addDays(today(),-7);
+  const out=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//mywall//CS','CALSCALE:GREGORIAN'];
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+  const ev=(id,date,time,dur,title,desc)=>{
+    out.push('BEGIN:VEVENT',`UID:${id}@muj-planovac`,`DTSTAMP:${stamp}`);
+    const dd=date.replace(/-/g,'');
+    if(time){
+      const [h,m]=time.split(':').map(Number),e=new Date(0,0,1,h,m+(dur||60));
+      out.push(`DTSTART:${dd}T${pad(h)}${pad(m)}00`,`DTEND:${dd}T${pad(e.getHours())}${pad(e.getMinutes())}00`);
+    }else out.push(`DTSTART;VALUE=DATE:${dd}`,`DTEND;VALUE=DATE:${addDays(date,1).replace(/-/g,'')}`);
+    out.push('SUMMARY:'+icsEsc(title));
+    if(desc)out.push('DESCRIPTION:'+icsEsc(desc));
+    out.push('END:VEVENT');
+  };
+  let n=0;
+  S.workouts.filter(w=>w.date>=from).forEach(w=>{const sp=SPORTS[w.sport]||SPORTS.other;ev(w.id,w.date,w.time,w.durMin,`${sp.i} ${w.title||sp.n}`,[w.description,w.intensity].filter(Boolean).join('\n'));n++});
+  S.tasks.filter(t=>t.date&&t.date>=from&&!t.done).forEach(t=>{ev(t.id,t.date,t.time,t.est,'✅ '+t.title,t.notes);n++});
+  out.push('END:VCALENDAR');
+  if(!n){toast('Není co exportovat – zatím nic nemáš naplánované.');return}
+  download('muj-plan.ics',out.join('\r\n'),'text/calendar');
+  toast(`Vyexportováno ${n} položek. V Google Kalendáři: Nastavení → Import a export → Importovat.`);
+}
+const SCHEMA_ALL=`{
+  "workouts": [
+    {"date":"YYYY-MM-DD","time":"HH:MM nebo prázdné","sport":"run|bike|swim|strength|mobility|walk|other","title":"název","description":"podrobný popis (rozcvičení, hlavní část, klus, tempa, tepové zóny…)","durationMin":50,"distanceKm":8,"intensity":"např. Z2 / tempo / intervaly","goal":"název cíle nebo prázdné"}
+  ],
+  "tasks": [
+    {"title":"…","project":"název projektu","priority":1,"due":"YYYY-MM-DD nebo prázdné","date":"YYYY-MM-DD kdy to udělat","estimateMin":30,"notes":""}
+  ],
+  "goals": [ {"title":"…","sport":"run","target":"např. pod 2:00","deadline":"YYYY-MM-DD","notes":""} ],
+  "nutrition": [ {"date":"YYYY-MM-DD","kcal":2100,"protein":120,"carbs":250,"fat":70} ],
+  "wellness": [ {"date":"YYYY-MM-DD","steps":9000,"sleepH":7.2,"restingHr":52,"weightKg":62.5} ]
+}`;
+function buildTrainingPrompt(ws){
+  const we=addDays(ws,6),t=today(),from=addDays(t,-28);
+  const goals=S.goals.filter(g=>!g.done).map(g=>`- ${g.title} (${(SPORTS[g.sport]||SPORTS.other).n})${g.target?', cíl: '+g.target:''}${g.deadline?', termín: '+g.deadline:''}${g.notes?' – '+g.notes:''}`).join('\n')||'(zatím nezadané)';
+  const hist=S.workouts.filter(w=>w.date>=from&&w.date<=t).sort((a,b)=>a.date.localeCompare(b.date)).map(w=>{
+    const plan=`plán ${w.durMin||'?'} min${w.distKm?', '+w.distKm+' km':''}${w.intensity?', '+w.intensity:''}`;
+    const res=w.done?`SPLNĚNO: ${w.aDur||w.durMin||'?'} min${w.aDist?', '+w.aDist+' km':''}${w.aHr?', prům. TF '+w.aHr:''}${w.rpe!=null?', RPE '+w.rpe+'/10':''}${w.feel?', pocit '+w.feel+'/5':''}${w.pain?', bolest/potíže: '+w.pain:''}${w.notes?', poznámka: '+w.notes:''}`:(w.date<t?'NESPLNĚNO':'naplánováno');
+    return `${w.date} ${w.sport} „${w.title}“ (${plan}) → ${res}`;
+  }).join('\n')||'(žádná historie)';
+  const cur=S.workouts.filter(w=>w.date>=ws&&w.date<=we).sort((a,b)=>a.date.localeCompare(b.date)).map(w=>`${w.date} ${w.sport} „${w.title}“ ${w.durMin||'?'} min`).join('\n')||'(nic)';
+  const tpl=S.template.map(x=>`${DAYS[x.dow]}: ${x.sport} „${x.title}“ ${x.durMin||'?'} min`).join('\n')||'(žádná)';
+  const wel=Object.keys(S.wellness).filter(d=>d>=addDays(t,-7)).sort().map(d=>{const w=S.wellness[d];return `${d}: kroky ${w.steps??'?'}, spánek ${w.sleepH??'?'} h, klidová TF ${w.restingHr??'?'}, váha ${w.weightKg??'?'}`}).join('\n');
+  const nk=Object.keys(S.nutrition).filter(d=>d>=addDays(t,-7)).map(d=>S.nutrition[d].kcal).filter(Boolean);
+  const evs=S.events.filter(e=>e.date>=ws&&e.date<=we).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||''))).map(e=>`${e.date} ${e.time||'celý den'}${e.endTime?'–'+e.endTime:''} ${e.title}`).join('\n');
+  return `Jsi můj zkušený sportovní trenér. Připrav mi tréninkový plán na týden ${ws} (pondělí) až ${we} (neděle).
+
+MŮJ PROFIL A PRAVIDLA:
+${S.settings.coachProfile||'(doplň v aplikaci v sekci Propojení)'}
+
+MOJE CÍLE:
+${goals}
+
+MOJE OBVYKLÁ TÝDENNÍ STRUKTURA:
+${tpl}
+
+TRÉNINKY POSLEDNÍCH 4 TÝDNŮ (plán → skutečnost, včetně pocitů):
+${hist}
+
+AKTUÁLNĚ NAPLÁNOVÁNO V CÍLOVÉM TÝDNU:
+${cur}
+${wel?`\nZDRAVÍ A REGENERACE (posledních 7 dní):\n${wel}\n`:''}${nk.length?`\nPrůměrný příjem posledních dní: ${Math.round(avg(nk))} kcal/den\n`:''}${evs?`\nMOJE ZÁVAZKY V KALENDÁŘI TENTO TÝDEN (naplánuj kolem nich):\n${evs}\n`:''}
+POŽADAVKY:
+- Zohledni, jak jsem se cítila, RPE, nesplněné tréninky a případné potíže.
+- Postupně zatěžuj, zařaď regeneraci.
+- Do description napiš konkrétní strukturu tréninku (rozcvička, hlavní část, tepové zóny/tempa, výklus).
+
+Odpověz POUZE jedním JSON blokem v tomto formátu (klíč "workouts", žádný další text):
+${SCHEMA_ALL.split('"tasks"')[0].trim()}
+  ]
+}
+Datum ve formátu YYYY-MM-DD, sport jedno z: run, bike, swim, strength, mobility, walk, other.`;
+}
+function buildTaskPrompt(text){
+  const t=today();
+  const pj=S.projects.map(p=>`- ${p.name}${p.keywords.length?' (klíčová slova: '+p.keywords.join(', ')+')':''}`).join('\n');
+  const evs=S.events.filter(e=>e.date>=mondayOf(t)&&e.date<=addDays(mondayOf(t),13)).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||''))).slice(0,40).map(e=>`${e.date} ${e.time||'celý den'}${e.endTime?'–'+e.endTime:''} ${e.title}`).join('\n');
+  return `Roztřiď mi úkoly a tréninky na týden. Dnes je ${t} (${DAYS[dow(t)]}).
+
+MOJE PROJEKTY (používej přesně tyto názvy; nový projekt navrhni jen když žádný nesedí):
+${pj}
+
+Pravidla:
+- priority: 1 = vysoká/urgentní, 2 = střední, 3 = nízká
+- pro každý úkol urči projekt, prioritu, termín (due), doporučený den provedení (date) a odhad času v minutách
+- slouč duplicity, příliš velké úkoly rozděl na konkrétní kroky
+- poznej, co je sportovní trénink (do pole workouts) a co pracovní úkol (do pole tasks)
+- nejdůležitější věci dej na začátek týdne, v pracovním dni nepřetěžuj (cca ${S.settings.workHours} h práce)
+${evs?`\nMOJE UDÁLOSTI V KALENDÁŘI:\n${evs}\n`:''}
+MŮJ TEXT / DIKTÁT:
+"""
+${text||'(sem vlož)'}
+"""
+
+Odpověz POUZE jedním JSON blokem:
+{"tasks":[{"title":"…","project":"název projektu","priority":1,"due":"YYYY-MM-DD nebo prázdné","date":"YYYY-MM-DD","estimateMin":30,"notes":""}],"workouts":[{"date":"YYYY-MM-DD","time":"","sport":"run|bike|swim|strength|mobility|walk|other","title":"…","description":"…","durationMin":50,"distanceKm":8,"intensity":"Z2"}]}`;
+}
+
+/* =====================  GOOGLE KALENDÁŘ (volitelné, OAuth)  ===================== */
+let gTok=null;
+function loadGIS(){
+  return new Promise((res,rej)=>{
+    if(window.google&&google.accounts&&google.accounts.oauth2)return res();
+    const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=res;s.onerror=()=>rej(new Error('Nepodařilo se načíst Google přihlášení'));document.head.appendChild(s);
+  });
+}
+async function gConnect(){
+  if(location.protocol==='file:'){openModal(`<h2 class="mt">Google přihlášení nefunguje ze souboru</h2><p>Google dovolí přihlášení jen pro stránku z adresy http(s). Soubor otevřený z disku (file://) projít nemůže.</p><p>Možnosti: nahrát soubor na hosting (např. GitHub Pages / Netlify) nebo ho spustit lokálně přes <code>localhost</code>. Do té doby použij <b>import a export .ics</b> – funguje vždy.</p><button class="btn" data-act="closeModal">Rozumím</button>`);return}
+  if(!S.settings.gcalClientId){toast('Nejdřív vlož Google Client ID.');return}
+  try{
+    await loadGIS();
+    google.accounts.oauth2.initTokenClient({client_id:S.settings.gcalClientId,scope:'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.calendarlist.readonly',
+      callback:r=>{if(r.access_token){gTok=r.access_token;toast('Google Kalendář připojen');render();gLoadCals();gPull()}else toast('Přihlášení se nepovedlo')}}).requestAccessToken({prompt:''});
+  }catch(e){toast(e.message)}
+}
+async function gFetch(path,opt={}){
+  const r=await fetch('https://www.googleapis.com/calendar/v3'+path,Object.assign({},opt,{headers:{Authorization:'Bearer '+gTok,'Content-Type':'application/json'}}));
+  if(!r.ok){if(r.status===401)gTok=null;throw new Error(r.status+' '+(await r.text()).slice(0,160))}
+  return r.status===204?null:r.json();
+}
+async function gPush(){
+  if(!gTok){toast('Nejdřív se připoj ke Google Kalendáři.');return}
+  const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,from=addDays(today(),-1);
+  const items=[
+    ...S.workouts.filter(w=>w.date>=from).map(w=>({kind:'w',o:w,title:`${(SPORTS[w.sport]||SPORTS.other).i} ${w.title||SPORTS[w.sport].n}`,desc:[w.description,w.intensity].filter(Boolean).join('\n'),dur:w.durMin||60})),
+    ...S.tasks.filter(t=>t.date&&t.date>=from&&t.time&&!t.done).map(t=>({kind:'t',o:t,title:'✅ '+t.title,desc:t.notes||'',dur:t.est||30}))
+  ];
+  let ok=0,fail=0;
+  for(const it of items){
+    const o=it.o;
+    const body={summary:it.title,description:it.desc,extendedProperties:{private:{plannerId:o.id}}};
+    if(o.time){
+      const [h,m]=o.time.split(':').map(Number),e=new Date(0,0,1,h,m+it.dur);
+      body.start={dateTime:`${o.date}T${pad(h)}:${pad(m)}:00`,timeZone:tz};
+      body.end={dateTime:`${o.date}T${pad(e.getHours())}:${pad(e.getMinutes())}:00`,timeZone:tz};
+    }else{body.start={date:o.date};body.end={date:addDays(o.date,1)}}
+    try{
+      let r;
+      if(o.gcalId){try{r=await gFetch('/calendars/primary/events/'+o.gcalId,{method:'PUT',body:JSON.stringify(body)})}catch(e){r=null}}
+      if(!r)r=await gFetch('/calendars/primary/events',{method:'POST',body:JSON.stringify(body)});
+      o.gcalId=r.id;ok++;
+    }catch(e){fail++}
+  }
+  save();render();
+  toast(`Do Google Kalendáře odesláno ${ok} položek${fail?', '+fail+' selhalo':''}`);
+}
+
+/* =====================  LOGO  ===================== */
+const LOGO_D="M283.46,190.69 L243.63,190.18 C181.53,174.45 142.26,153.65 111.02,131.07 C126.32,185.68 112.9,243.65 70.09,304.84 L124,340.17 L187.81,268.29 C231.02,244.95 273.75,274.99 251.76,317.76 L198.6,378.82 L283.46,440.13 L368.33,378.82 L315.17,317.76 C293.18,274.99 335.91,244.95 379.12,268.29 L442.93,340.17 L496.84,304.84 C454.02,243.65 440.61,185.68 455.91,131.07 C424.67,153.65 385.4,174.45 323.3,190.18 Z";
+const LOGO=`<svg viewBox="62 122 443 326" xmlns="http://www.w3.org/2000/svg" aria-label="mywall." role="img"><path fill="#F3ECEC" d="${LOGO_D}"/></svg>`;
+(function setFavicon(){
+  try{
+    const fav=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 567.12 567.12"><rect x="3" y="3" width="561.12" height="561.12" rx="78" fill="#080B14"/><path fill="#F3ECEC" d="${LOGO_D}"/></svg>`;
+    const l=document.createElement('link');l.rel='icon';
+    l.href='data:image/svg+xml,'+encodeURIComponent(fav);
+    document.head.appendChild(l);
+  }catch(e){}
+})();
+
+/* =====================  CLOUDOVÁ SYNCHRONIZACE (soukromý GitHub Gist, volitelně šifrovaně)  ===================== */
+const SYNC_KEY='planner.sync.v1',SYNC_FILE='mywall-data.json';
+const COLS=['goals','workouts','template','tasks','projects'],DICTS=['nutrition','wellness'];
+const SYNC_SET=['name','coachProfile','workHours','autoTemplate','kcalGoal','proteinGoal'];
+let cfg=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_KEY))||{}}catch(e){return{}}})();
+const saveCfg=()=>{try{localStorage.setItem(SYNC_KEY,JSON.stringify(cfg))}catch(e){}};
+let snap=new Map(),syncing=false,syncTimer=null,needRender=false,syncMsg='',syncErr=false,syncInit=false;
+
+function persist(){try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){toast('Nepodařilo se uložit – je v prohlížeči plné místo?')}}
+function save(){stampAll();persist();scheduleSync()}
+
+/* každé položce se při změně nastaví čas úpravy (_u), smazané položky se zapamatují (tomb) */
+function stampAll(){
+  const now=Date.now(),seen=new Set(),ser=o=>JSON.stringify(o,(k,v)=>k==='_u'?undefined:v);
+  const visit=(key,it)=>{
+    if(!it||typeof it!=='object')return;
+    seen.add(key);const j=ser(it);
+    if(!snap.has(key)){if(!it._u)it._u=now;snap.set(key,j)}
+    else if(snap.get(key)!==j){it._u=now;snap.set(key,j)}
+  };
+  COLS.forEach(c=>(S[c]||[]).forEach(it=>visit(c+':'+it.id,it)));
+  DICTS.forEach(c=>Object.keys(S[c]||{}).forEach(d=>visit(c+':'+d,S[c][d])));
+  S.tomb=S.tomb||{};
+  [...snap.keys()].forEach(k=>{if(!seen.has(k)){snap.delete(k);S.tomb[k]=now}});
+}
+function exportSync(){
+  const o={v:1,savedAt:Date.now(),tomb:S.tomb||{},events:S.events||[],eventsU:S.eventsU||0,generatedWeeks:S.generatedWeeks||[],settings:{_u:S.settings._u||0}};
+  SYNC_SET.forEach(k=>{o.settings[k]=S.settings[k]});
+  COLS.forEach(c=>{o[c]=S[c]||[]});DICTS.forEach(c=>{o[c]=S[c]||{}});
+  return o;
+}
+function mergeSync(L,R){
+  const M={v:1,savedAt:Date.now()},tomb={},keep=Date.now()-90*864e5;
+  [L.tomb||{},R.tomb||{}].forEach(t=>Object.keys(t).forEach(k=>{if(t[k]>keep&&(!tomb[k]||t[k]>tomb[k]))tomb[k]=t[k]}));
+  M.tomb=tomb;
+  for(const c of COLS){
+    const map=new Map();
+    [...(R[c]||[]),...(L[c]||[])].forEach(it=>{const p=map.get(it.id);if(!p||(it._u||0)>=(p._u||0))map.set(it.id,it)});
+    M[c]=[...map.values()].filter(it=>{const t=tomb[c+':'+it.id];return!(t&&t>=(it._u||0))});
+  }
+  for(const c of DICTS){
+    const out={},l=L[c]||{},r=R[c]||{};
+    new Set([...Object.keys(r),...Object.keys(l)]).forEach(d=>{
+      const a=l[d],b=r[d];
+      out[d]=!a?b:!b?a:((a._u||0)>=(b._u||0)?a:b);
+    });
+    M[c]=out;
+  }
+  const le=L.eventsU||0,re=R.eventsU||0;
+  M.events=le>=re?(L.events||[]):(R.events||[]);M.eventsU=Math.max(le,re);
+  M.settings=((L.settings||{})._u||0)>=((R.settings||{})._u||0)?L.settings:R.settings;
+  M.generatedWeeks=[...new Set([...(L.generatedWeeks||[]),...(R.generatedWeeks||[])])];
+  return M;
+}
+function sig(o){
+  const a=[];
+  COLS.concat(DICTS).forEach(c=>{
+    const v=o[c];
+    if(Array.isArray(v))v.forEach(it=>a.push(c+':'+it.id+':'+(it._u||0)));
+    else Object.keys(v||{}).forEach(d=>a.push(c+':'+d+':'+(((v||{})[d]||{})._u||0)));
+  });
+  Object.keys(o.tomb||{}).forEach(k=>a.push('t:'+k+':'+o.tomb[k]));
+  a.push('e:'+(o.eventsU||0),'s:'+((o.settings||{})._u||0),'g:'+(o.generatedWeeks||[]).slice().sort().join(','));
+  return a.sort().join('|');
+}
+function applyRemote(M){
+  COLS.forEach(c=>{S[c]=M[c]||[]});
+  DICTS.forEach(c=>{S[c]=M[c]||{}});
+  S.events=M.events||[];S.eventsU=M.eventsU||0;
+  S.generatedWeeks=M.generatedWeeks||[];S.tomb=M.tomb||{};
+  if(M.settings){SYNC_SET.forEach(k=>{if(M.settings[k]!==undefined)S.settings[k]=M.settings[k]});S.settings._u=M.settings._u||0}
+  const byName={},remap={};
+  S.projects=S.projects.filter(p=>{const k=norm(p.name).trim();if(byName[k]){remap[p.id]=byName[k];return false}byName[k]=p.id;return true});
+  if(Object.keys(remap).length)S.tasks.forEach(t=>{if(remap[t.projectId])t.projectId=remap[t.projectId]});
+}
+const isPristine=()=>!S.workouts.length&&!S.tasks.length&&!S.goals.length&&!S.template.length;
+
+/* šifrování (AES-GCM, klíč z hesla přes PBKDF2) */
+function b64(u){let s='';const a=new Uint8Array(u);for(let i=0;i<a.length;i+=8192)s+=String.fromCharCode.apply(null,a.subarray(i,i+8192));return btoa(s)}
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function cryptoKey(pass,salt){
+  if(!(window.crypto&&crypto.subtle))throw new Error('Šifrování nejde v tomto prohlížeči použít (potřebuje https nebo soubor z disku).');
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:120000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function pack(obj){
+  if(!cfg.pass)return JSON.stringify({app:'mywall',enc:0,data:obj});
+  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await cryptoKey(cfg.pass,salt);
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(obj)));
+  return JSON.stringify({app:'mywall',enc:1,salt:b64(salt),iv:b64(iv),ct:b64(ct)});
+}
+async function unpack(str){
+  const p=JSON.parse(str);
+  if(!p.enc)return p.data;
+  if(!cfg.pass)throw new Error('Data v cloudu jsou šifrovaná – chybí heslo.');
+  try{
+    const key=await cryptoKey(cfg.pass,unb64(p.salt));
+    const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(p.iv)},key,unb64(p.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }catch(e){throw new Error('Špatné heslo k šifrování.')}
+}
+async function gh(path,opt){
+  const r=await fetch('https://api.github.com'+path,Object.assign({cache:'no-store'},opt,{headers:{Authorization:'Bearer '+cfg.token,Accept:'application/vnd.github+json','Content-Type':'application/json'}}));
+  if(!r.ok){
+    let t='';try{t=(await r.json()).message}catch(e){}
+    throw new Error(r.status===401?'Token není platný.':r.status===404?'Gist nenalezen (zkontroluj token a kód).':'GitHub '+r.status+' '+t);
+  }
+  return r.json();
+}
+
+function syncLabel(){
+  if(!cfg.token||!cfg.gistId)return'Uloženo jen v tomto prohlížeči';
+  if(syncErr)return'⚠ '+syncMsg;
+  if(syncing)return'☁ Synchronizuji…';
+  return cfg.lastSync?'☁ Synchronizováno '+new Date(cfg.lastSync).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'}):'☁ Čeká na synchronizaci';
+}
+function setStat(msg,err){syncMsg=msg||'';syncErr=!!err;document.querySelectorAll('[data-syncstat]').forEach(el=>{el.textContent=syncLabel()})}
+
+async function syncNow(manual){
+  if(!cfg.token||!cfg.gistId||syncing)return;
+  syncing=true;setStat('');
+  try{
+    const g=await gh('/gists/'+cfg.gistId);
+    const f=g.files&&g.files[SYNC_FILE];
+    let R=null;
+    if(f){
+      let c=f.content;
+      if(f.truncated)c=await(await fetch(f.raw_url)).text();
+      if(c&&c.trim())R=await unpack(c);
+    }
+    stampAll();
+    const L=exportSync();
+    let M;
+    if(!R)M=L;
+    else if(!cfg.lastSync&&isPristine())M=Object.assign({},R);
+    else M=mergeSync(L,R);
+    const sM=sig(M);
+    const localChanged=sM!==sig(L);
+    const remoteChanged=!R||sM!==sig(R);
+    if(localChanged){
+      applyRemote(M);
+      snap.clear();stampAll();persist();
+      const busy=$('#modal-root').children.length||(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName));
+      if(busy)needRender=true;else render();
+    }
+    if(remoteChanged){
+      const content=await pack(exportSync());
+      await gh('/gists/'+cfg.gistId,{method:'PATCH',body:JSON.stringify({files:{[SYNC_FILE]:{content}}})});
+    }
+    cfg.lastSync=Date.now();saveCfg();
+    syncing=false;setStat('');
+    if(manual)toast(localChanged?'Synchronizováno – načetla jsem změny z jiného zařízení':'Synchronizováno');
+  }catch(e){
+    syncing=false;setStat(e.message,true);
+    if(manual)toast('Synchronizace selhala: '+e.message);
+  }
+}
+function scheduleSync(){
+  if(!cfg.token||!cfg.gistId)return;
+  clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow(),3000);
+}
+function initSync(){
+  if(syncInit||!cfg.token||!cfg.gistId)return;
+  syncInit=true;
+  syncNow();
+  setInterval(()=>{if(!document.hidden)syncNow()},60000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncNow()});
+  window.addEventListener('online',()=>syncNow());
+}
+async function syncOn(){
+  const tok=(($('#syTok')||{}).value||'').trim(),pass=($('#syPass')||{}).value||'';
+  if(!tok){toast('Vlož GitHub token.');return}
+  cfg={token:tok,pass,gistId:''};
+  try{
+    stampAll();
+    const content=await pack(exportSync());
+    const g=await gh('/gists',{method:'POST',body:JSON.stringify({description:'mywall. – data (nemazat)',public:false,files:{[SYNC_FILE]:{content}}})});
+    cfg.gistId=g.id;cfg.lastSync=Date.now();saveCfg();
+    toast('Synchronizace zapnuta');initSync();render();
+  }catch(e){cfg={};toast('Nepodařilo se zapnout: '+e.message)}
+}
+function syncCode(){
+  const code='MYWALL1:'+b64(new TextEncoder().encode(JSON.stringify({t:cfg.token,g:cfg.gistId,p:cfg.pass||''})));
+  openPrompt('Kód pro další zařízení',code,'Tento kód vlož na druhém zařízení do pole Už mám kód. Obsahuje token i heslo, nikomu ho neposílej.');
+}
+async function syncJoin(){
+  const raw=(($('#syCode')||{}).value||'').trim().replace(/^MY(?:VAL|WALL)1:/,'');
+  try{
+    const o=JSON.parse(new TextDecoder().decode(unb64(raw)));
+    if(!o.t||!o.g)throw new Error('x');
+    cfg={token:o.t,gistId:o.g,pass:o.p||''};saveCfg();
+    syncInit=false;initSync();render();
+    toast('Připojeno, načítám data…');
+  }catch(e){toast('Kód se nepodařilo přečíst.')}
+}
+function syncOff(){
+  if(!confirm('Vypnout synchronizaci na tomto zařízení? Data zůstanou v zařízení i v cloudu.'))return;
+  cfg={};saveCfg();render();
+}
+function syncCard(){
+  const on=!!(cfg.token&&cfg.gistId);
+  return `<div class="card"><h3>☁️ Synchronizace mobil ↔ počítač</h3>
+   <p class="mut small">${on?'Změny se automaticky přenášejí mezi všemi zařízeními, kde zadáš stejný kód. Slučuje se po položkách, takže nic nepřepíše celý stav.':'Data se ukládají do tvého soukromého (neveřejného) GitHub Gistu, volitelně zašifrovaně. Funguje na každém zařízení, kde aplikaci otevřeš z internetové adresy.'}</p>
+   <div class="row" style="margin:8px 0"><b data-syncstat>${esc(syncLabel())}</b></div>
+   ${on?`<div class="row"><button class="btn pri" data-act="syncNow">Synchronizovat teď</button><button class="btn" data-act="syncCode">Kód pro další zařízení</button><button class="btn danger" data-act="syncOff">Vypnout</button></div>`
+   :`<label class="fl">GitHub token (oprávnění „gist“)<input type="password" id="syTok" autocomplete="off" placeholder="ghp_…"></label>
+     <label class="fl" style="margin-top:10px">Heslo pro šifrování (doporučeno – vymysli si vlastní)<input type="password" id="syPass" autocomplete="off"></label>
+     <div class="row" style="margin-top:10px"><button class="btn pri" data-act="syncOn">Zapnout synchronizaci</button></div>
+     <label class="fl" style="margin-top:14px">Už mám kód z jiného zařízení<input type="text" id="syCode" placeholder="MYWALL1:…"></label>
+     <button class="btn" style="margin-top:8px" data-act="syncJoin">Připojit tímto kódem</button>`}
+   <details style="margin-top:14px"><summary>Jak to nastavit (jednou, asi 10 minut)</summary>
+    <ol class="small" style="margin:8px 0 0;padding-left:18px">
+     <li>Založ si zdarma účet na <b>github.com</b>.</li>
+     <li>Otevři <b>github.com/settings/tokens/new</b> (klasický token): poznámka „mywall.“, Expiration „No expiration“, zaškrtni <b>jen „gist“</b>, Generate token a token zkopíruj.</li>
+     <li>Vlož ho sem, vymysli heslo k šifrování a klikni „Zapnout synchronizaci“.</li>
+     <li>Aby aplikace šla otevřít na mobilu, musí být na internetové adrese. Na GitHubu vytvoř nový veřejný repozitář, nahraj tento soubor pod názvem <b>index.html</b> a v Settings → Pages zapni publikaci z větve main. Adresu otevři na mobilu (v Chromu „Přidat na plochu“). Ve veřejném repozitáři je jen kód aplikace, ne tvoje data.</li>
+     <li>Na počítači klikni „Kód pro další zařízení“, pošli si ho (např. do poznámek) a na mobilu ho vlož do pole „Už mám kód“.</li>
+    </ol>
+    <p class="small mut" style="margin-top:8px">Kód obsahuje token i heslo, nikomu ho neposílej. Token zůstává jen v prohlížeči každého zařízení.</p></details></div>`;
+}
+
+/* =====================  IMPORT SOUBORŮ Z GARMINU (FIT / TCX / GPX / ZIP)  ===================== */
+function decodeText(buf){
+  try{return new TextDecoder('utf-8',{fatal:true}).decode(buf)}
+  catch(e){return new TextDecoder('windows-1250').decode(buf)}
+}
+async function inflateRaw(u8){
+  const s=new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(s).arrayBuffer());
+}
+async function unzip(buf){
+  const u8=new Uint8Array(buf),dv=new DataView(buf),out=[];
+  let e=-1;
+  for(let i=u8.length-22;i>=Math.max(0,u8.length-70000);i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break}}
+  if(e<0)throw new Error('ZIP');
+  const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);
+  for(let i=0;i<n;i++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true);
+    const nl=dv.getUint16(p+28,true),el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    const name=new TextDecoder().decode(u8.subarray(p+46,p+46+nl));
+    p+=46+nl+el+cl;
+    if(name.endsWith('/'))continue;
+    const lnl=dv.getUint16(off+26,true),lel=dv.getUint16(off+28,true);
+    const start=off+30+lnl+lel;
+    const raw=u8.subarray(start,start+csize);
+    const data=method===0?raw:method===8?await inflateRaw(raw):null;
+    if(data)out.push({name,data:data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength)});
+  }
+  return out;
+}
+const hav=(a,b,c,d)=>{const R=6371000,r=Math.PI/180,dl=(c-a)*r,dn=(d-b)*r;const h=Math.sin(dl/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+function mkAct(date,time,sport,durSec,distM,hr,maxHr,title){
+  return{date,time,sport,title:title||'',durMin:durSec!=null?Math.round(durSec/60):null,distKm:distM!=null?Math.round(distM/10)/100:null,
+    hr:hr||null,maxHr:maxHr||null,key:`g:${date}T${time}:${sport}`};
+}
+/* ---- FIT (binární formát Garminu): čtu záznamy typu "session" ---- */
+function readFit(dv,p,size,type,little){
+  const bt=type&0x1f;
+  try{
+    switch(bt){
+      case 0:case 2:case 13:{const v=dv.getUint8(p);return v===255?null:v}
+      case 10:{const v=dv.getUint8(p);return v===0?null:v}
+      case 1:{const v=dv.getInt8(p);return v===127?null:v}
+      case 3:{const v=dv.getInt16(p,little);return v===32767?null:v}
+      case 4:{const v=dv.getUint16(p,little);return v===65535?null:v}
+      case 11:{const v=dv.getUint16(p,little);return v===0?null:v}
+      case 5:{const v=dv.getInt32(p,little);return v===2147483647?null:v}
+      case 6:{const v=dv.getUint32(p,little);return v===4294967295?null:v}
+      case 12:{const v=dv.getUint32(p,little);return v===0?null:v}
+      case 8:return dv.getFloat32(p,little);
+      case 9:return dv.getFloat64(p,little);
+      default:return null;
+    }
+  }catch(e){return null}
+}
+function parseFIT(buf){
+  const dv=new DataView(buf);
+  if(buf.byteLength<14||String.fromCharCode(dv.getUint8(8),dv.getUint8(9),dv.getUint8(10),dv.getUint8(11))!=='.FIT')throw new Error('Není to FIT soubor');
+  const hs=dv.getUint8(0),dataSize=dv.getUint32(4,true);
+  let pos=hs;const end=Math.min(buf.byteLength,hs+dataSize);
+  const defs={},sessions=[];
+  while(pos<end){
+    const h=dv.getUint8(pos++);
+    if(h&0x80){const d=defs[(h>>5)&3];if(!d)break;pos+=d.size;continue}
+    const lt=h&0x0f;
+    if(h&0x40){
+      pos++;
+      const little=dv.getUint8(pos++)===0;
+      const gm=dv.getUint16(pos,little);pos+=2;
+      const nf=dv.getUint8(pos++);
+      const fields=[];let size=0;
+      for(let i=0;i<nf;i++){fields.push({num:dv.getUint8(pos),size:dv.getUint8(pos+1),type:dv.getUint8(pos+2)});size+=dv.getUint8(pos+1);pos+=3}
+      if(h&0x20){const nd=dv.getUint8(pos++);for(let i=0;i<nd;i++){size+=dv.getUint8(pos+1);pos+=3}}
+      defs[lt]={gm,little,fields,size};
+    }else{
+      const d=defs[lt];if(!d)break;
+      if(d.gm===18){
+        const rec={};let p=pos;
+        for(const f of d.fields){rec[f.num]=readFit(dv,p,f.size,f.type,d.little);p+=f.size}
+        sessions.push(rec);
+      }
+      pos+=d.size;
+    }
+  }
+  return sessions;
+}
+function fitActivities(buf){
+  const out=[];
+  parseFIT(buf).forEach(r=>{
+    const st=r[2]!=null?r[2]:r[253];if(st==null)return;
+    const d=new Date((st+631065600)*1000);
+    const sec=r[8]!=null?r[8]/1000:(r[7]!=null?r[7]/1000:null);
+    const sp=r[5],sub=r[6];
+    let sport='other';
+    if(sp===1)sport='run';else if(sp===2)sport='bike';else if(sp===5)sport='swim';
+    else if(sp===11||sp===17)sport='walk';
+    else if(sp===10||sp===4)sport=(sub===43||sub===44)?'mobility':'strength';
+    out.push(mkAct(ymd(d),`${pad(d.getHours())}:${pad(d.getMinutes())}`,sport,sec,r[9]!=null?r[9]/100:null,r[16],r[17]));
+  });
+  return out;
+}
+/* ---- TCX a GPX ---- */
+function parseTCX(text){
+  const x=new DOMParser().parseFromString(text,'application/xml');
+  const out=[];
+  x.querySelectorAll('Activity').forEach(a=>{
+    const d=new Date((a.querySelector('Id')||{}).textContent);if(isNaN(d))return;
+    let dur=0,dist=0,mx=0;const hr=[];
+    a.querySelectorAll('Lap').forEach(l=>{
+      dur+=parseFloat((l.querySelector('TotalTimeSeconds')||{}).textContent)||0;
+      dist+=parseFloat((l.querySelector('DistanceMeters')||{}).textContent)||0;
+      const ah=l.querySelector('AverageHeartRateBpm Value');if(ah)hr.push(+ah.textContent);
+      const mh=l.querySelector('MaximumHeartRateBpm Value');if(mh)mx=Math.max(mx,+mh.textContent);
+    });
+    out.push(mkAct(ymd(d),`${pad(d.getHours())}:${pad(d.getMinutes())}`,sportId(a.getAttribute('Sport')),dur,dist,hr.length?Math.round(avg(hr)):null,mx||null));
+  });
+  return out;
+}
+function parseGPX(text){
+  const x=new DOMParser().parseFromString(text,'application/xml');
+  const out=[];
+  x.querySelectorAll('trk').forEach(t=>{
+    const pts=[...t.querySelectorAll('trkpt')];
+    const tm=pts.map(p=>(p.querySelector('time')||{}).textContent).filter(Boolean);
+    if(pts.length<2||!tm.length)return;
+    const t0=new Date(tm[0]),t1=new Date(tm[tm.length-1]);
+    if(isNaN(t0))return;
+    let dist=0;
+    for(let i=1;i<pts.length;i++)dist+=hav(+pts[i-1].getAttribute('lat'),+pts[i-1].getAttribute('lon'),+pts[i].getAttribute('lat'),+pts[i].getAttribute('lon'));
+    const hrs=[...t.querySelectorAll('hr')].map(h=>+h.textContent).filter(Boolean);
+    const type=(t.querySelector('type')||{}).textContent||'';
+    out.push(mkAct(ymd(t0),`${pad(t0.getHours())}:${pad(t0.getMinutes())}`,sportId(type),(t1-t0)/1000,dist,hrs.length?Math.round(avg(hrs)):null,hrs.length?Math.max(...hrs):null,(t.querySelector('name')||{}).textContent||''));
+  });
+  return out;
+}
+/* ---- společný náhled a import aktivit ---- */
+function previewActivities(acts,label){
+  const seen=new Set();
+  acts=acts.filter(a=>!seen.has(a.key)&&seen.add(a.key));
+  const pairs=matchActivities(acts);
+  const nm=pairs.filter(p=>p.m).length,nd=pairs.filter(p=>p.dup).length,nn=pairs.length-nm-nd;
+  const rows=pairs.slice(0,8).map(p=>`<tr><td>${fmtDay(p.a.date)}</td><td>${SPORTS[p.a.sport].i} ${esc(p.a.title||SPORTS[p.a.sport].n)}</td><td>${p.a.durMin??'–'} min</td><td>${p.a.distKm??'–'} km</td><td>${p.dup?'už je':p.m?'→ plán':'nový'}</td></tr>`).join('');
+  pend={apply:()=>applyActivities(pairs)};
+  openModal(`<h2 class="mt">⌚ Import z Garminu</h2>
+    <p>Nalezeno <b>${acts.length}</b> aktivit${label?' ('+esc(label)+')':''}.</p>
+    <ul><li><b>${nm}</b> se spáruje s naplánovaným tréninkem téhož dne a sportu (označí se jako splněné a doplní se čas, km, tepovka)</li>
+    <li><b>${nn}</b> se přidá jako nový trénink mimo plán</li>
+    <li><b>${nd}</b> už v aplikaci je (přeskočím)</li></ul>
+    <table class="t">${rows}</table>${pairs.length>8?`<div class="mut small">…a dalších ${pairs.length-8}</div>`:''}
+    <div class="row" style="margin-top:14px"><button class="btn pri" data-act="applyPending">Importovat</button><button class="btn" data-act="closeModal">Zrušit</button></div>`);
+}
+async function importFiles(files){
+  const acts=[],texts=[];let bad=0;
+  const handle=async(name,buf)=>{
+    const ext=(name.split('.').pop()||'').toLowerCase();
+    try{
+      if(ext==='zip'){for(const e of await unzip(buf))await handle(e.name,e.data)}
+      else if(ext==='fit')acts.push(...fitActivities(buf));
+      else if(ext==='tcx')acts.push(...parseTCX(decodeText(buf)));
+      else if(ext==='gpx')acts.push(...parseGPX(decodeText(buf)));
+      else if(['csv','txt','json','ics'].includes(ext))texts.push({name,text:decodeText(buf)});
+    }catch(e){bad++}
+  };
+  for(const f of files)await handle(f.name,await f.arrayBuffer());
+  if(acts.length)previewActivities(acts,files.length>1?files.length+' souborů':files[0].name);
+  else if(texts.length)handleText(texts[0].text,texts[0].name);
+  else toast(bad?'Soubor se nepodařilo přečíst.':'Tento typ souboru neznám (podporuji FIT, TCX, GPX, ZIP, CSV, JSON, ICS).');
+}
+function buildNutritionPrompt(){
+  const t=today();
+  return `Jsi nutriční poradce. Odhadni nutriční hodnoty jídla, které ti popíšu nebo pošlu na fotce. Dnes je ${t}.
+
+Pokud odhad není jistý, uveď rozumný střed a v poznámce napiš, z čeho jsi vycházela.
+
+Odpověz POUZE jedním JSON blokem. Hodnoty jsou CELKEM za toto jídlo, "mode":"add" znamená, že se přičtou k dnešním součtům v aplikaci:
+{"nutrition":[{"date":"${t}","mode":"add","kcal":0,"protein":0,"carbs":0,"fat":0}]}
+
+(bílkoviny, sacharidy a tuky v gramech)
+
+Jídlo:
+`;
+}
+function importCard(){
+  const gw=S.workouts.filter(w=>w.source==='Garmin').sort((a,b)=>b.date.localeCompare(a.date));
+  const nd=Object.keys(S.nutrition).filter(d=>S.nutrition[d]&&S.nutrition[d].kcal).sort();
+  const gar=gw.length?`${gw.length} aktivit načteno, poslední ${fmtDay(gw[0].date)}`:'zatím nic nenahráno';
+  const nut=nd.length?`${nd.length} dnů se stravou, poslední ${fmtDay(nd[nd.length-1])}`:'zatím nic nezadáno';
+  const cal=S.events.length?`${S.events.length} událostí${S.settings.lastCal?', naposledy '+new Date(S.settings.lastCal).toLocaleDateString('cs-CZ'):''}`:'zatím nic nenačteno';
+  return `<div class="card"><h3>⌚ Garmin · 🥗 strava · 📅 kalendář</h3>
+   <div style="margin:8px 0 14px">
+     <div class="lr"><b>⌚ Garmin</b><span>${esc(gar)}</span></div>
+     <div class="lr"><b>🥗 Strava</b><span>${esc(nut)}</span></div>
+     <div class="lr"><b>📅 Kalendář</b><span>${esc(cal)}${gTok?' · Google připojen':''}</span></div>
+   </div>
+   <label class="fl">Nahrát soubory (klidně víc najednou)<input type="file" data-change="file" multiple accept=".fit,.tcx,.gpx,.zip,.csv,.txt,.json,.ics"></label>
+   <p class="mut small" style="margin-top:6px">Rozpoznám: aktivity z Garminu (<b>FIT, TCX, GPX, ZIP, CSV</b>), jídelníček (<b>CSV</b>), kalendář (<b>ICS</b>), odpověď od ChatGPT (<b>JSON</b>) i zálohu aplikace.</p>
+   <details style="margin-top:10px"><summary>⌚ Jak dostat aktivity z Garminu</summary>
+     <div class="small" style="margin-top:8px">
+      <b>Jednotlivé aktivity:</b> connect.garmin.com → Aktivity → otevři aktivitu → ozubené kolo ⚙ → <i>Exportovat originál</i> (ZIP s .fit) nebo <i>Exportovat TCX / GPX</i>. Soubor sem nahraj, ZIP rozbalovat nemusíš.<br>
+      <b>Hromadně:</b> Aktivity → Všechny aktivity → sjeď seznam dolů, aby se načetly všechny → <i>Exportovat CSV</i>.<br>
+      <b>Přímo z hodinek:</b> po připojení USB kabelem jsou soubory ve složce <i>GARMIN/Activity</i> (.fit), dají se nahrát najednou.<br>
+      <span class="mut">Automatické stahování z Garminu v prohlížeči nejde: Garmin nemá veřejné rozhraní pro osobní účty a přihlášení tvým heslem do aplikace nedělám.</span>
+     </div></details>
+   <details style="margin-top:8px"><summary>🥗 Jak dostat stravu</summary>
+     <div class="small" style="margin-top:8px">
+      <b>Export z aplikace:</b> MyFitnessPal (Premium) a Cronometer umí export deníku do CSV, ve Kalorických tabulkách ho najdeš v exportu deníku, pokud ho tvůj tarif umožňuje (menu se podle verze liší). Rozpoznám sloupce Datum, Kalorie/kcal/kJ, Bílkoviny, Sacharidy, Tuky; víc záznamů za den sečtu.<br>
+      <b>Bez exportu:</b> v záložce Můj den zadáš kalorie a bílkoviny za den ručně, nebo jídlo nech odhadnout ChatGPT (tlačítko níž) a výsledek vlož sem jako JSON, přičte se k dnešním součtům.
+     </div>
+     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="gptNutri">Prompt: odhad jídla pro ChatGPT</button></div></details>
+   <label class="fl" style="margin-top:12px">…nebo vložit text (CSV / JSON / ICS)
+     <textarea id="pasteIn" placeholder="Vlož obsah souboru nebo odpověď ChatGPT"></textarea></label>
+   <button class="btn" style="margin-top:8px" data-act="pasteApply">Zpracovat</button>
+  </div>`;
+}
+/* ---- Google Kalendář: výběr více kalendářů ---- */
+let gCals=null;
+const gcalSel=()=>{try{return JSON.parse(localStorage.getItem('planner.gcal.v1'))||[]}catch(e){return[]}};
+const gcalSet=a=>{try{localStorage.setItem('planner.gcal.v1',JSON.stringify(a))}catch(e){}};
+async function gLoadCals(){
+  if(!gTok)return;
+  try{
+    const d=await gFetch('/users/me/calendarList?minAccessRole=reader');
+    gCals=(d.items||[]).map(c=>({id:c.id,name:c.summaryOverride||c.summary||c.id,primary:!!c.primary}));
+    if(!gcalSel().length){const pr=gCals.find(c=>c.primary);if(pr)gcalSet([pr.id])}
+    if(view==='propojeni')render();
+  }catch(e){toast('Seznam kalendářů se nepodařilo načíst: '+e.message)}
+}
+async function gPull(){
+  if(!gTok){toast('Nejdřív se připoj ke Google Kalendáři.');return}
+  try{
+    const min=new Date(addDays(today(),-7)+'T00:00:00').toISOString(),max=new Date(addDays(today(),60)+'T00:00:00').toISOString();
+    const ids=gcalSel().length?gcalSel():['primary'];
+    const evs=[];
+    for(const cid of ids){
+      const d=await gFetch(`/calendars/${encodeURIComponent(cid)}/events?singleEvents=true&orderBy=startTime&maxResults=250&timeMin=${encodeURIComponent(min)}&timeMax=${encodeURIComponent(max)}`);
+      (d.items||[]).forEach(e=>{
+        if(e.status==='cancelled'||(e.extendedProperties&&e.extendedProperties.private&&e.extendedProperties.private.plannerId))return;
+        const s=e.start||{},en=e.end||{};
+        if(s.dateTime){
+          const a=new Date(s.dateTime),b=new Date(en.dateTime);
+          evs.push({id:'g:'+cid+':'+e.id,date:ymd(a),time:`${pad(a.getHours())}:${pad(a.getMinutes())}`,endTime:ymd(a)===ymd(b)?`${pad(b.getHours())}:${pad(b.getMinutes())}`:'',title:e.summary||'(bez názvu)',loc:e.location||'',allDay:false,source:'google'});
+        }else if(s.date){
+          const span=Math.min(14,Math.round((pd(en.date||s.date)-pd(s.date))/864e5)||1);
+          for(let k=0;k<span;k++)evs.push({id:'g:'+cid+':'+e.id+':'+k,date:addDays(s.date,k),time:'',endTime:'',title:e.summary||'(bez názvu)',loc:'',allDay:true,source:'google'});
+        }
+      });
+    }
+    S.events=S.events.filter(e=>e.source!=='google').concat(evs);S.eventsU=Date.now();S.settings.lastCal=Date.now();
+    save();render();
+    toast(`Z Google Kalendáře načteno ${evs.length} událostí (${ids.length} ${ids.length===1?'kalendář':'kalendáře'})`);
+  }catch(e){toast('Chyba Google: '+e.message)}
+}
+function gCalPicker(){
+  if(!gTok)return'';
+  if(!gCals)return`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="gCalsLoad">Vybrat kalendáře</button></div>`;
+  const sel=gcalSel();
+  return `<div class="small" style="margin-top:12px"><b>Které kalendáře načítat:</b>${gCals.map(c=>`<label class="chkrow" style="font-weight:500;margin:6px 0"><input type="checkbox" data-change="gcalSel" value="${esc(c.id)}" ${sel.includes(c.id)?'checked':''}>${esc(c.name)}${c.primary?' <span class="mut">(hlavní)</span>':''}</label>`).join('')}</div>`;
+}
+function gGuide(){
+  return `<details style="margin-top:12px"><summary>Jak získat Client ID (jednou)</summary>
+   <ol class="small" style="margin:8px 0 0;padding-left:18px">
+    <li>Otevři <b>console.cloud.google.com</b> a vytvoř nový projekt.</li>
+    <li>APIs &amp; Services → Library → zapni <b>Google Calendar API</b>.</li>
+    <li>OAuth consent screen → External → vyplň název aplikace a přidej sebe jako <b>Test user</b>.</li>
+    <li>Credentials → Create credentials → OAuth client ID → <b>Web application</b>. U „Authorized JavaScript origins“ uveď adresu, kde aplikace běží (např. https://tvuj-ucet.github.io).</li>
+    <li>Zkopíruj Client ID sem, ulož a klikni „Připojit“. Přihlášení platí zhruba hodinu, pak stačí kliknout znovu.</li>
+   </ol></details>`;
+}
+
+/* =====================  STRAVA (oficiální API, OAuth) + VYHODNOCENÍ TRÉNINKU  ===================== */
+const STRAVA_KEY='planner.strava.v1',AI_KEY='planner.ai.v1';
+let sv=(()=>{try{return JSON.parse(localStorage.getItem(STRAVA_KEY))||{}}catch(e){return{}}})();
+const saveSv=()=>{try{localStorage.setItem(STRAVA_KEY,JSON.stringify(sv))}catch(e){}};
+const aiCfg=()=>{try{return JSON.parse(localStorage.getItem(AI_KEY))||{}}catch(e){return{}}};
+const aiSave=o=>{try{localStorage.setItem(AI_KEY,JSON.stringify(o))}catch(e){}};
+let svBusy=false,svInit=false;
+
+function stravaConnect(){
+  if(location.protocol==='file:'){
+    openModal(`<h2 class="mt">Strava se přihlásí jen z internetové adresy</h2><p>Strava vrací po přihlášení na adresu stránky, takže soubor otevřený z disku (file://) nejde použít. Stejně jako u synchronizace potřebuješ aplikaci nahrát na adresu (např. GitHub Pages) a tuto adresu zadat ve Stravě jako „Authorization Callback Domain“.</p><button class="btn" data-act="closeModal">Rozumím</button>`);
+    return;
+  }
+  const id=(($('#svId')||{}).value||'').trim(),sec=(($('#svSec')||{}).value||'').trim();
+  if(!id||!sec){toast('Vlož Client ID i Client Secret ze Strava API.');return}
+  sv=Object.assign(sv,{clientId:id,clientSecret:sec,err:''});saveSv();
+  const q=new URLSearchParams({client_id:id,redirect_uri:location.origin+location.pathname,response_type:'code',approval_prompt:'auto',scope:'read,activity:read_all',state:'mywall'});
+  location.href='https://www.strava.com/oauth/authorize?'+q.toString();
+}
+async function stravaToken(body){
+  const r=await fetch('https://www.strava.com/oauth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({client_id:sv.clientId,client_secret:sv.clientSecret},body))});
+  if(!r.ok)throw new Error('Strava odmítla přihlášení ('+r.status+'). Zkontroluj Client ID, Secret a callback doménu.');
+  return r.json();
+}
+async function stravaHandleCallback(){
+  let u;try{u=new URL(location.href)}catch(e){return}
+  const code=u.searchParams.get('code');
+  if(!code||u.searchParams.get('state')!=='mywall'||!sv.clientId)return;
+  const scope=u.searchParams.get('scope')||'';
+  try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
+  try{
+    const t=await stravaToken({code,grant_type:'authorization_code'});
+    sv.access=t.access_token;sv.refresh=t.refresh_token;sv.expires=t.expires_at;
+    sv.athlete=t.athlete?[t.athlete.firstname,t.athlete.lastname].filter(Boolean).join(' '):'';
+    sv.err='';saveSv();
+    view='propojeni';location.hash='propojeni';render();
+    if(!/activity:read/.test(scope))toast('Strava nedala oprávnění číst aktivity. Připoj znovu a nech zaškrtnuté „View data about your activities“.');
+    else{toast('Strava připojena');stravaSync(true)}
+  }catch(e){sv.err=e.message;saveSv();toast(e.message)}
+}
+async function stravaAccess(){
+  if(!sv.refresh)throw new Error('Strava není připojená');
+  if(!sv.access||(sv.expires||0)<Date.now()/1000+60){
+    const t=await stravaToken({grant_type:'refresh_token',refresh_token:sv.refresh});
+    sv.access=t.access_token;sv.refresh=t.refresh_token||sv.refresh;sv.expires=t.expires_at;saveSv();
+  }
+  return sv.access;
+}
+async function stravaGet(path){
+  const r=await fetch('https://www.strava.com/api/v3'+path,{headers:{Authorization:'Bearer '+await stravaAccess()}});
+  if(r.status===429)throw new Error('Strava: příliš mnoho požadavků, zkus to za chvíli.');
+  if(r.status===401)throw new Error('Strava: platnost přihlášení vypršela, připoj znovu.');
+  if(!r.ok)throw new Error('Strava '+r.status);
+  return r.json();
+}
+
+/* ---- rozbor popisku (pocit, RPE, potíže) ---- */
+function analyzeNotes(text){
+  const res={feel:null,rpe:null,pain:''};
+  const raw=String(text||'');
+  const n=norm(raw);
+  if(!n.trim())return res;
+  const POS=/\b(skvel\w*|super|parad\w*|lehk\w*|v pohode|pohoda|svizn\w*|silna|silne|silny|nadhern\w*|uzasn\w*|radost|letel\w*|dobre|dobry|dobra|fajn|spokojen\w*|povedl\w*|jako nova|forma)\b/g;
+  const NEG=/\b(tezk\w*|vycerpan\w*|vyrizen\w*|unav\w*|bolest\w*|boli|boleli|tahal\w*|taha|piche|natazen\w*|zle|spatn\w*|krize|krizi|nesel\w*|nejde|trapen\w*|utrpen\w*|bez sil|ztuhl\w*|nemocn\w*|nachlazen\w*|zranen\w*|zraneni)\b/g;
+  let sc=(n.match(POS)||[]).length-(n.match(NEG)||[]).length;
+  sc=Math.max(-3,Math.min(3,sc));
+  const hits=(n.match(POS)||[]).length+(n.match(NEG)||[]).length;
+  const em=(raw.match(/😫|🥵|😖|😩/g)||[]).length*-2+(raw.match(/😕|😓|😞/g)||[]).length*-1+(raw.match(/🙂|😊|😀/g)||[]).length+(raw.match(/😍|🥰|💪|🔥|🤩|😎/g)||[]).length*2;
+  sc+=em;
+  if(hits||em)res.feel=sc<=-2?1:sc===-1?2:sc===0?3:sc===1?4:5;
+  const r=n.match(/rpe\s*[:=\-]?\s*(\d{1,2})/)||n.match(/\b(\d{1,2})\s*\/\s*10\b/);
+  if(r){const v=+r[1];if(v>=1&&v<=10)res.rpe=v}
+  const PAIN=/(boli|bolest|tahal|taha\b|tahani|piche|natazen|zranen|zraneni|ztuhl|namoz|zatnul)/;
+  const sent=raw.split(/(?<=[.!?\n])\s*/).filter(s=>PAIN.test(norm(s)));
+  res.pain=sent.map(s=>s.trim()).filter(Boolean).slice(0,2).join(' ').slice(0,200);
+  return res;
+}
+function evaluateWorkout(w){
+  if(!w||!w.done)return'';
+  const p=[];
+  if(w.durMin&&w.aDur){
+    const d=Math.round((w.aDur-w.durMin)/w.durMin*100);
+    p.push(Math.abs(d)<=10?`délka podle plánu (${w.aDur} z ${w.durMin} min)`:d>0?`o ${d} % delší než plán (${w.aDur} vs ${w.durMin} min)`:`o ${-d} % kratší než plán (${w.aDur} vs ${w.durMin} min)`);
+  }else if(w.aDur)p.push(w.aDur+' min');
+  if(w.distKm&&w.aDist){
+    const d=Math.round((w.aDist-w.distKm)/w.distKm*100);
+    if(Math.abs(d)>10)p.push(`${w.aDist} km (${d>0?'+':''}${d} % oproti plánu)`);else p.push(w.aDist+' km');
+  }else if(w.aDist)p.push(w.aDist+' km');
+  if(w.sport==='run'&&w.aDist&&w.aDur){const pace=w.aDur/w.aDist,mm=Math.floor(pace),ss=Math.round((pace-mm)*60);p.push(`tempo ${mm}:${String(ss===60?59:ss).padStart(2,'0')} /km`)}
+  if(w.aHr)p.push('TF Ø '+w.aHr+(w.aMaxHr?' (max '+w.aMaxHr+')':''));
+  if(w.feel)p.push('pocit '+FEELS[w.feel-1]);
+  if(w.rpe!=null)p.push('RPE '+w.rpe+'/10');
+  let v='';
+  if(w.pain)v='Pozor na potíže, zvaž odlehčení.';
+  else if((w.feel&&w.feel<=2)||(w.rpe!=null&&w.rpe>=9))v='Náročné, hlídej regeneraci.';
+  else if(w.feel>=4)v='Trénink šel dobře.';
+  return [p.join(' · '),v].filter(Boolean).join(' – ');
+}
+
+/* ---- zápis aktivity ze Stravy do plánu ---- */
+function stravaApply(a,have){
+  const sport=sportId(a.sport_type||a.type||'');
+  const st=String(a.start_date_local||a.start_date||'');
+  const date=st.slice(0,10),time=st.slice(11,16);
+  if(!isIso(date))return null;
+  const durMin=Math.round((a.moving_time||a.elapsed_time||0)/60)||null;
+  const distKm=a.distance?Math.round(a.distance/10)/100:null;
+  const desc=String(a.description||'').trim();
+  const ext='strava:'+a.id;
+  let w=have,kind='upd';
+  if(!w){
+    const same=S.workouts.filter(x=>x.date===date&&x.sport===sport&&!String(x.ext||'').startsWith('strava:'));
+    w=same.find(x=>x.done&&x.aDur&&durMin&&Math.abs(x.aDur-durMin)<=Math.max(5,durMin*0.15))||same.find(x=>!x.done)||null;
+    if(!w){
+      w={id:'sv-'+a.id,date,time,sport,title:a.name||SPORTS[sport].n,description:'',durMin:null,distKm:null,intensity:'',goalId:'',notes:''};
+      S.workouts.push(w);
+    }
+    kind='new';
+  }
+  const before=JSON.stringify([w.done,w.aDur,w.aDist,w.aHr,w.svDesc,w.notes,w.feel,w.rpe,w.pain]);
+  w.done=true;w.ext=ext;w.source='Strava';
+  if(!w.time&&time)w.time=time;
+  if(durMin)w.aDur=durMin;
+  if(distKm)w.aDist=distKm;
+  if(a.average_heartrate)w.aHr=Math.round(a.average_heartrate);
+  if(a.max_heartrate)w.aMaxHr=Math.round(a.max_heartrate);
+  if(desc&&desc!==w.svDesc){
+    const manual=String(w.notes||'').replace(w.svDesc||'','').trim();
+    w.notes=[manual,desc].filter(Boolean).join('\n');
+    w.svDesc=desc;w.aiEval='';
+    const an=analyzeNotes(desc);
+    if(w.feel==null&&an.feel)w.feel=an.feel;
+    if(w.rpe==null&&an.rpe)w.rpe=an.rpe;
+    if(!w.pain&&an.pain)w.pain=an.pain;
+  }
+  if(w.rpe==null&&a.perceived_exertion>=1&&a.perceived_exertion<=10)w.rpe=Math.round(a.perceived_exertion);
+  const after=JSON.stringify([w.done,w.aDur,w.aDist,w.aHr,w.svDesc,w.notes,w.feel,w.rpe,w.pain]);
+  if(kind==='new')return'new';
+  return before!==after?'upd':null;
+}
+async function stravaSync(manual){
+  if(!sv.refresh||svBusy)return;
+  svBusy=true;
+  try{
+    const since=sv.lastSync?sv.lastSync-3*864e5:Date.now()-60*864e5;
+    const after=Math.floor(since/1000);
+    const all=[];
+    for(let page=1;page<=4;page++){
+      const l=await stravaGet(`/athlete/activities?after=${after}&per_page=50&page=${page}`);
+      all.push(...l);
+      if(l.length<50)break;
+    }
+    let nNew=0,nUpd=0;const fresh=[];
+    for(const a of all){
+      const have=S.workouts.find(w=>w.ext==='strava:'+a.id);
+      const recent=Date.now()-new Date(a.start_date||0).getTime()<3*864e5;
+      let det=a;
+      if(!have||recent||manual){try{det=await stravaGet('/activities/'+a.id)}catch(e){if(/429/.test(e.message)||/mnoho/.test(e.message))throw e;det=a}}
+      const r=stravaApply(det,have);
+      if(r==='new'){nNew++}else if(r==='upd')nUpd++;
+      if(r){const w=S.workouts.find(x=>x.ext==='strava:'+a.id);if(w&&w.svDesc&&!w.aiEval)fresh.push(w.id)}
+    }
+    sv.lastSync=Date.now();sv.err='';saveSv();
+    if(nNew||nUpd){save();render();toast(`Strava: ${nNew} nových a ${nUpd} upravených aktivit`)}
+    else if(manual)toast('Strava: žádné nové aktivity');
+    const c=aiCfg();
+    if(c.key&&c.auto){for(const id of fresh.slice(0,3)){try{await aiEvalWorkout(id,true)}catch(e){}}}
+  }catch(e){
+    sv.err=e.message;saveSv();
+    if(manual)toast(e.message);
+    if(view==='propojeni')render();
+  }
+  svBusy=false;
+}
+function initStrava(){
+  if(svInit||!sv.refresh)return;
+  svInit=true;
+  stravaSync();
+  setInterval(()=>{if(!document.hidden)stravaSync()},10*60*1000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-(sv.lastSync||0)>5*60*1000)stravaSync()});
+}
+function stravaOff(){
+  if(!confirm('Odpojit Stravu na tomto zařízení? Už načtené tréninky zůstanou.'))return;
+  sv={};saveSv();svInit=false;render();
+}
+
+/* ---- AI hodnocení (volitelné, vlastní klíč) ---- */
+function buildEvalPrompt(w){
+  const sp=SPORTS[w.sport]||SPORTS.other,g=goal(w.goalId);
+  const hist=S.workouts.filter(x=>x.done&&x.id!==w.id&&x.date<=w.date).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6)
+    .map(x=>`${x.date} ${x.sport} ${x.aDur||x.durMin||'?'} min${x.aDist?', '+x.aDist+' km':''}${x.feel?', pocit '+x.feel+'/5':''}${x.rpe!=null?', RPE '+x.rpe:''}${x.pain?', potíže: '+x.pain:''}`).join('\n')||'(žádná)';
+  return `Jsi sportovní trenér. Stručně (maximálně 4 věty, česky, bez úvodu) vyhodnoť tento trénink: zda odpovídal plánu, co z popisku plyne o tom, jak se sportovkyně cítila, na co si dát pozor a jak navázat další den.
+
+CÍL: ${g?g.title+(g.target?' – '+g.target:''):'(nezadán)'}
+PLÁN: ${sp.n} „${w.title||''}“, ${w.durMin||'?'} min${w.distKm?', '+w.distKm+' km':''}${w.intensity?', '+w.intensity:''}${w.description?'\nPopis plánu: '+w.description:''}
+SKUTEČNOST: ${w.aDur||'?'} min${w.aDist?', '+w.aDist+' km':''}${w.aHr?', průměrná TF '+w.aHr:''}${w.aMaxHr?', max '+w.aMaxHr:''}${w.rpe!=null?', RPE '+w.rpe+'/10':''}${w.feel?', pocit '+w.feel+'/5':''}
+POPISEK SPORTOVKYNĚ: ${w.notes||'(žádný)'}${w.pain?'\nPotíže: '+w.pain:''}
+
+POSLEDNÍ TRÉNINKY:
+${hist}`;
+}
+async function aiComplete(prompt){
+  const c=aiCfg();
+  if(!c.key)throw new Error('Chybí API klíč (Propojení → Strava → AI hodnocení).');
+  if(c.provider==='anthropic'){
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':c.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:c.model||'claude-sonnet-5-5',max_tokens:600,messages:[{role:'user',content:prompt}]})});
+    if(!r.ok)throw new Error('AI '+r.status+' – zkontroluj klíč a model.');
+    const j=await r.json();
+    return(j.content||[]).map(x=>x.text||'').join('').trim();
+  }
+  const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json',Authorization:'Bearer '+c.key},
+    body:JSON.stringify({model:c.model||'gpt-4o-mini',messages:[{role:'user',content:prompt}]})});
+  if(!r.ok)throw new Error('AI '+r.status+' – zkontroluj klíč a model.');
+  const j=await r.json();
+  return((j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'').trim();
+}
+async function aiEvalWorkout(id,quiet){
+  const w=wkById(id);if(!w)return;
+  const text=await aiComplete(buildEvalPrompt(w));
+  w.aiEval=text;save();
+  if(!quiet){closeModal();render();openWorkout(id,true);toast('AI vyhodnocení uloženo')}
+  else render();
+}
+
+function svCard(){
+  const on=!!sv.refresh,c=aiCfg(),file=location.protocol==='file:';
+  return `<div class="card"><h3>🟧 Strava – automatické načítání aktivit a popisků</h3>
+   <p class="mut small">Garmin už posílá aktivity do Stravy. mywall si je z ní samo stáhne (při otevření a pak každých pár minut), spáruje s plánem, vezme z popisku pocit, RPE a potíže a trénink vyhodnotí. Ruční export není potřeba.</p>
+   <div class="row" style="margin:8px 0"><b>${on?'✓ Připojeno'+(sv.athlete?' – '+esc(sv.athlete):''):'Nepřipojeno'}</b>${sv.lastSync?`<span class="mut small">naposledy ${new Date(sv.lastSync).toLocaleString('cs-CZ',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})}</span>`:''}</div>
+   ${sv.err?`<div class="small" style="color:var(--bad);margin-bottom:8px">⚠ ${esc(sv.err)}</div>`:''}
+   ${file&&!on?'<div class="small" style="color:var(--bad);margin-bottom:8px">Teď běžíš ze souboru na disku. Strava se přihlásí jen na internetové adrese (viz návod níž).</div>':''}
+   ${on?`<div class="row"><button class="btn pri" data-act="stravaSync">Načíst teď</button><button class="btn danger" data-act="stravaOff">Odpojit</button></div>
+         <p class="mut small" style="margin-top:8px">Stačí mít Stravu připojenou na jednom zařízení, na druhé se aktivity objeví synchronizací.</p>`
+   :`<div class="f2"><label class="fl">Client ID<input type="text" id="svId" value="${esc(sv.clientId||'')}" autocomplete="off"></label>
+        <label class="fl">Client Secret<input type="password" id="svSec" value="${esc(sv.clientSecret||'')}" autocomplete="off"></label></div>
+     <div class="row" style="margin-top:10px"><button class="btn pri" data-act="stravaConnect">Připojit Stravu</button></div>`}
+   <details style="margin-top:12px"><summary>Jak to nastavit (jednou)</summary>
+    <ol class="small" style="margin:8px 0 0;padding-left:18px">
+     <li>V Garmin Connect (Nastavení → Propojené aplikace) máš propojenou Stravu, aktivity se tak nahrávají samy.</li>
+     <li>Otevři <b>strava.com/settings/api</b> a vytvoř aplikaci: název „mywall“, kategorie třeba Training, Website libovolná. <b>Authorization Callback Domain</b> = doména, kde mywall běží (např. <i>tvujucet.github.io</i>, bez https://).</li>
+     <li>Zkopíruj <b>Client ID</b> a <b>Client Secret</b> sem a klikni „Připojit Stravu“. Strava se zeptá na povolení a vrátí tě zpátky.</li>
+     <li>Popisek přidej ve Stravě k aktivitě jako obvykle. mywall ho při dalším načtení přečte, z textu vezme pocit, RPE a bolesti (třeba „tahá lýtko“, „skvělé“, „RPE 7“).</li>
+    </ol>
+    <p class="small mut" style="margin-top:8px">Strava používá tvůj vlastní klíč, není sdílený s nikým jiným. Secret zůstává jen v prohlížeči tohoto zařízení. Načítání probíhá, když je mywall otevřený, na pozadí bez otevřené aplikace to bez serveru nejde.</p></details>
+   <details style="margin-top:8px"><summary>🤖 Hodnocení tréninku umělou inteligencí (volitelné)</summary>
+    <div class="small mut" style="margin:8px 0">Bez klíče dělá mywall vyhodnocení sama z čísel a popisku (plán vs. skutečnost, pocit, potíže). S klíčem navíc pošle trénink AI, která napíše krátké hodnocení a doporučení. Pozor: předplatné ChatGPT Plus není to samé jako API klíč, API se platí zvlášť (jedno hodnocení stojí jednotky haléřů).</div>
+    <div class="f2"><label class="fl">Poskytovatel<select data-change="aiSet" name="provider"><option value="openai" ${c.provider!=='anthropic'?'selected':''}>OpenAI (ChatGPT)</option><option value="anthropic" ${c.provider==='anthropic'?'selected':''}>Anthropic (Claude)</option></select></label>
+      <label class="fl">Model<input type="text" data-change="aiSet" name="model" value="${esc(c.model||'')}" placeholder="${c.provider==='anthropic'?'claude-sonnet-5-5':'gpt-4o-mini'}"></label></div>
+    <label class="fl" style="margin-top:10px">API klíč<input type="password" data-change="aiSet" name="key" value="${esc(c.key||'')}" autocomplete="off"></label>
+    <label class="chkrow" style="margin-top:10px;font-weight:500"><input type="checkbox" data-change="aiSet" name="auto" ${c.auto?'checked':''}> Automaticky hodnotit nové aktivity s popiskem</label>
+    <p class="small mut" style="margin-top:6px">Klíč zůstává jen v tomto prohlížeči (nesynchronizuje se ani nezálohuje).</p></details>
+  </div>`;
+}
+
+/* =====================  KOMPONENTY  ===================== */
+function wkCard(w,compact){
+  const sp=SPORTS[w.sport]||SPORTS.other;
+  const plan=[w.durMin?w.durMin+' min':'',w.distKm?w.distKm+' km':'',w.intensity].filter(Boolean).join(' · ');
+  const act=w.done?[w.aDur?w.aDur+' min':'',w.aDist?w.aDist+' km':'',w.aHr?'TF '+w.aHr:'',w.rpe!=null?'RPE '+w.rpe:''].filter(Boolean).join(' · '):'';
+  const g=goal(w.goalId);
+  return `<div class="item wk ${w.done?'done':''}" style="--c:${sp.c}" draggable="true" data-drag="w:${w.id}">
+    <button class="chk ${w.done?'on':''}" data-act="togW" data-id="${w.id}" aria-label="Splněno">${w.done?'✓':''}</button>
+    <div class="badge">${sp.i}</div>
+    <div class="body" data-act="editW" data-id="${w.id}">
+      <div class="t">${esc(w.title||sp.n)}</div>
+      <div class="m">${w.time?esc(w.time)+' · ':''}${esc(plan)||'bez plánu'}${g&&!compact?' · 🎯 '+esc(g.title):''}</div>
+      ${w.description&&!w.done?`<div class="d">${esc(w.description)}</div>`:''}
+      ${w.done&&(act||w.feel)?`<div class="m" style="color:var(--ok);font-weight:600"><span class="feel">${w.feel?FEELS[w.feel-1]:''}</span> ${esc(act)}${w.source?' · '+esc(w.source):''}</div>`:''}
+      ${w.done&&evaluateWorkout(w)?`<div class="d">${esc(evaluateWorkout(w))}</div>`:''}${w.aiEval?`<div class="d" style="color:var(--ink)">🤖 ${esc(w.aiEval)}</div>`:''}
+    </div></div>`;
+}
+function tkCard(t){
+  const p=proj(t.projectId),late=!t.done&&((t.due&&t.due<today())||(t.date&&t.date<today()));
+  return `<div class="item tk ${t.done?'done':''} ${late?'late':''}" draggable="true" data-drag="t:${t.id}">
+    <button class="chk ${t.done?'on':''}" data-act="togT" data-id="${t.id}" aria-label="Hotovo">${t.done?'✓':''}</button>
+    <div class="body" data-act="editT" data-id="${t.id}">
+      <div class="t">${esc(t.title)}</div>
+      <div class="m">${p?`<span class="chip" style="--c:${p.color}">${esc(p.name)}</span>`:''}<span class="pdot p${t.prio||2}"></span>${PRIO[t.prio||2]}${t.due?' · ⏰ '+fmtDay(t.due):''}${t.time?' · '+esc(t.time):''}${t.est?' · '+t.est+' min':''}${late?' · <b style="color:var(--bad)">po termínu</b>':''}</div>
+    </div></div>`;
+}
+function evCard(e){
+  return `<div class="item ev"><div class="badge">📅</div><div class="body" style="cursor:default"><div class="t">${e.time?esc(e.time)+(e.endTime?'–'+esc(e.endTime):'')+' · ':''}${esc(e.title)}</div><div class="m">${e.allDay?'celý den · ':''}${esc(e.loc||'')} ${e.source==='google'?'Google':e.source==='ics'?'kalendář':''}</div></div></div>`;
+}
+
+/* =====================  POHLEDY  ===================== */
+let view=(location.hash||'#dnes').slice(1);
+let curWeek=mondayOf(today());
+let tFilter='all',showDone=false;
+const NAV=[['dnes','Můj den','☼'],['tyden','Týden','▦'],['ukoly','Úkoly','☑'],['cile','Cíle','◎'],['prehled','Přehled','◔'],['propojeni','Propojení','⇄']];
+
+function backupBanner(){
+  if(!(S.workouts.length||S.tasks.length))return'';
+  const lb=S.settings.lastBackup,days=lb?Math.floor((Date.now()-lb)/864e5):999;
+  if(days<14)return'';
+  return `<div class="banner">💾 <span>${lb?`Poslední záloha před ${days} dny.`:'Data jsou uložená jen v tomto prohlížeči a zatím bez zálohy.'}</span><button class="btn sm" data-act="exportBackup">Stáhnout zálohu</button></div>`;
+}
+
+function vToday(){
+  const t=today(),d=pd(t),hr=new Date().getHours();
+  const wks=S.workouts.filter(w=>w.date===t).sort(byTime);
+  const evs=S.events.filter(e=>e.date===t).sort(byTime);
+  const open=S.tasks.filter(x=>!x.done&&(x.date===t||x.due===t||(x.date&&x.date<t)||(x.due&&x.due<t))).sort(byPrio);
+  const late=S.tasks.filter(x=>!x.done&&((x.due&&x.due<t)||(x.date&&x.date<t))).length;
+  const soon=S.tasks.filter(x=>!x.done&&x.due&&x.due>t&&x.due<=addDays(t,7)).sort((a,b)=>a.due.localeCompare(b.due)).slice(0,4);
+  const st=weekStats(mondayOf(t));
+  const nut=S.nutrition[t]||{},wel=S.wellness[t]||{};
+  const empty=!S.goals.length&&!S.workouts.length&&!S.tasks.length;
+  const wMin=sum(wks.map(w=>w.durMin||0));
+  const tMin=sum(open.map(x=>x.est||30));
+  const top=open[0];
+  const nm=S.settings.name?esc(S.settings.name)+', ':'';
+  const sub=hr<10?nm+'dobré ráno. Jasné priority, prostor na soustředění.':hr<18?'Jasné priority. Prostor na soustředění.':nm+'dobrý večer. Zhodnoť den a připrav si zítřek.';
+  return `
+  <div class="pagehead">
+    <div class="sp"><div class="eyebrow">${DAYS[dow(t)]} ${d.getDate()}. ${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>
+      <h1>Můj den</h1><div class="sub">${sub}</div></div>
+    <button class="btn" data-act="dictate">🎤 Nadiktovat / napsat plán</button>
+    <button class="btn pri" data-act="newT" data-date="${t}">＋ Nový úkol</button>
+  </div>
+  ${empty?`<div class="card" style="margin-bottom:24px"><h3>Začínáme ve třech krocích</h3>
+    <ol><li><b>Cíle</b> – zadej své tréninkové cíle a nastav týdenní šablonu, ať se každý týden plán sám doplní.</li>
+    <li><b>Projekty</b> – v Úkolech si nastav projekty a klíčová slova, podle kterých se bude třídit diktát.</li>
+    <li><b>Propojení</b> – nahraj Garmin / stravu / kalendář a nech ChatGPT psát plány.</li></ol>
+    <div class="row"><button class="btn pri" data-act="nav" data-v="cile">Začít cíli</button><button class="btn" data-act="demo">Načíst ukázková data</button></div></div>`:''}
+  <div class="strip">
+    <div><small>Dnešní úkoly</small><b>${String(open.length).padStart(2,'0')}</b><span>čeká na vyřízení${tMin?' · cca '+r1(tMin/60)+' h':''}</span></div>
+    <div><small>Trénink dnes</small><b>${wMin?wMin+'<u>min</u>':(wks.length?wks.length+'×':'–')}</b><span>${wks.length?esc(wks.map(w=>w.title||SPORTS[w.sport].n).join(', ')):'volný den'}</span></div>
+    <div><small>Po termínu</small><b>${String(late).padStart(2,'0')}</b><span>${late?'potřebuje pozornost':'vše v pořádku'}</span></div>
+    <div><small>Tréninky týdne</small><b>${st.done}<u>/ ${st.planned}</u></b><span>splněno tento týden</span></div>
+  </div>
+  <div class="cols2">
+    <section>
+      <div class="row sec"><h2>Dnešní plán</h2><span class="sp"></span><button class="btn sm" data-act="newW" data-date="${t}">＋ Trénink</button></div>
+      ${wks.map(w=>wkCard(w)).join('')}
+      <input type="text" class="quick" data-quick placeholder="Rychle přidat úkol… např. „zavolat klientovi do pátku“ + Enter">
+      ${open.map(tkCard).join('')||(wks.length?'':'<div class="empty">Dnes volný prostor. Přidej úkol nebo trénink, nebo si rozplánuj týden. 🌿</div>')}
+    </section>
+    <section>
+      <div class="focus"><small>Malý krok, čistá hlava</small>
+        <h3>${top?esc(top.title):'Nejdřív to podstatné.'}</h3>
+        <p>${top?'Tohle je dnes tvoje nejvyšší priorita. Začni tím, zbytek počká.':'Vyber si jednu hlavní věc. Zbytek si rozlož do týdne a nech místo na trénink.'}</p>
+        ${top?`<button class="lnk" data-act="togT" data-id="${top.id}">Hotovo ✓</button>`:''}<button class="lnk" data-act="schedule">Rozvrhnout týden →</button></div>
+      ${evs.length?`<div class="sec"><h2>V kalendáři</h2></div>${evs.map(evCard).join('')}`:''}
+      <div class="sec"><h2>Blíží se termíny</h2></div>
+      ${soon.length?soon.map(tkCard).join(''):'<div class="mut small">Zatím žádný nadcházející termín.</div>'}
+      <div class="sec"><h2>Dnešní údaje</h2></div>
+      <div class="card"><div class="f3" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr))">
+        <label class="fl">Kalorie<input type="number" data-change="daily" name="kcal" value="${esc(nut.kcal??'')}" placeholder="kcal"></label>
+        <label class="fl">Bílkoviny (g)<input type="number" data-change="daily" name="protein" value="${esc(nut.protein??'')}"></label>
+        <label class="fl">Spánek (h)<input type="number" step="0.1" data-change="daily" name="sleepH" value="${esc(wel.sleepH??'')}"></label>
+        <label class="fl">Váha (kg)<input type="number" step="0.1" data-change="daily" name="weightKg" value="${esc(wel.weightKg??'')}"></label>
+      </div>${S.settings.kcalGoal&&nut.kcal!=null?`<div class="small mut" style="margin-top:12px">Zbývá <b>${Math.round(S.settings.kcalGoal-nut.kcal)} kcal</b> z ${S.settings.kcalGoal}${S.settings.proteinGoal&&nut.protein!=null?` · bílkoviny ${Math.round(nut.protein)} / ${S.settings.proteinGoal} g`:''}</div>`:''}</div>
+    </section>
+  </div>`;
+}
+
+function vWeek(){
+  const ws=curWeek,days=weekDays(ws),t=today(),st=weekStats(ws);
+  const unsched=S.tasks.filter(x=>!x.done&&!x.date);
+  const yr=pd(days[6]).getFullYear();
+  const isCur=ws===mondayOf(t);
+  return `
+  <div class="wk-head">
+    <button class="btn" data-act="wkPrev">‹</button>
+    <div class="wk-title">${fmtDay(ws)} – ${fmtDay(days[6])} ${yr}</div>
+    <button class="btn" data-act="wkNext">›</button>
+    ${isCur?'':'<button class="btn sm" data-act="wkToday">Tento týden</button>'}
+    <span class="sp"></span>
+    <button class="btn pri" data-act="newW" data-date="${isCur?t:ws}">＋ Trénink</button>
+    <button class="btn" data-act="newT" data-date="${isCur?t:ws}">＋ Úkol</button>
+    <button class="btn" data-act="dictate">🎤 Diktovat</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn sm" data-act="schedule">✨ Rozvrhnout úkoly do týdne</button>
+    <button class="btn sm" data-act="copyPrev">⎘ Zkopírovat tréninky z minulého týdne</button>
+    <button class="btn sm" data-act="fromTpl">▤ Doplnit ze šablony</button>
+  </div>
+  <div class="sumbar">
+    <div class="stat"><b>${st.done}/${st.planned}</b><span>splněné tréninky</span></div>
+    <div class="stat"><b>${st.doneMin}<small style="font-size:14px"> / ${st.planMin} min</small></b><span>odtrénováno / plán</span></div>
+    <div class="stat"><b>${st.feel?FEELS[Math.round(st.feel)-1]+' '+r1(st.feel):'–'}</b><span>průměrný pocit</span></div>
+    <div class="stat"><b>${st.tasksDone}/${st.tasks}</b><span>úkoly splněny</span></div>
+  </div>
+  <div class="grid7">
+  ${days.map((d,i)=>{
+    const evs=S.events.filter(e=>e.date===d).sort(byTime);
+    const wks=S.workouts.filter(w=>w.date===d).sort(byTime);
+    const tks=S.tasks.filter(x=>x.date===d).sort((a,b)=>byTime(a,b)||byPrio(a,b));
+    const dl=S.tasks.filter(x=>!x.done&&x.due===d&&x.date!==d);
+    const load=sum(tks.filter(x=>!x.done).map(x=>x.est||30));
+    return `<div class="day ${d===t?'today':''}" data-drop="${d}">
+      <h3><span>${DAYS_S[i]} ${fmtDay(d)}</span><span style="font-weight:600;text-transform:none;letter-spacing:0">${load?r1(load/60)+' h úkolů':''}</span></h3>
+      ${evs.map(evCard).join('')}${wks.map(w=>wkCard(w,true)).join('')}${tks.map(tkCard).join('')}
+      ${dl.map(x=>`<div class="m" style="font-size:12px;color:var(--bad);margin:2px 4px 6px;cursor:pointer" data-act="editT" data-id="${x.id}">⏰ termín: ${esc(x.title)}</div>`).join('')}
+      <div class="add"><button data-act="newW" data-date="${d}">＋ trénink</button><button data-act="newT" data-date="${d}">＋ úkol</button></div>
+    </div>`}).join('')}
+  </div>
+  ${unsched.length?`<div class="sec"><h2>Úkoly bez přiděleného dne (${unsched.length})</h2></div>${unsched.sort(byPrio).slice(0,12).map(tkCard).join('')}<div class="mut small">Přetáhni úkol na den, nebo klikni na „Rozvrhnout úkoly do týdne“.</div>`:''}`;
+}
+
+function vTasks(){
+  const list=S.tasks.filter(x=>(showDone||!x.done)&&(tFilter==='all'||(tFilter==='none'?(!x.projectId||!proj(x.projectId)):x.projectId===tFilter)));
+  const groups=[...S.projects.map(p=>[p,list.filter(x=>x.projectId===p.id)]),[null,list.filter(x=>!x.projectId||!proj(x.projectId))]].filter(g=>g[1].length);
+  return `
+  <div class="row">
+    <h1>Úkoly</h1><span class="sp"></span>
+    <button class="btn pri" data-act="dictate">🎤 Nadiktovat / vložit seznam</button>
+    <button class="btn" data-act="schedule">✨ Rozvrhnout do týdne</button>
+    <button class="btn" data-act="projects">Projekty</button>
+  </div>
+  <div class="mut" style="margin:6px 0 14px">Nadiktuj nebo vlož, co tě tenhle týden čeká. Aplikace úkoly rozdělí, určí projekt, prioritu a termín a rozvrhne je do dnů.</div>
+  <input type="text" class="quick" data-quick placeholder="Rychle přidat úkol… např. „připravit nabídku pro klienta do pátku, urgentní“ + Enter">
+  <div class="fchips">
+    <button class="${tFilter==='all'?'on':''}" data-act="tfilter" data-v="all">Vše</button>
+    ${S.projects.map(p=>`<button class="${tFilter===p.id?'on':''}" data-act="tfilter" data-v="${p.id}">${esc(p.name)}</button>`).join('')}
+    <button class="${tFilter==='none'?'on':''}" data-act="tfilter" data-v="none">Nezařazené</button>
+    <label class="chkrow" style="margin-left:auto;font-weight:500"><input type="checkbox" data-change="showDone" ${showDone?'checked':''}> Zobrazit hotové</label>
+  </div>
+  ${groups.length?groups.map(([p,l])=>`<div class="pg"><h3><span class="dot" style="background:${p?p.color:'var(--mut)'}"></span>${p?esc(p.name):'Nezařazené'} <span class="mut" style="font-weight:500">${l.length}</span></h3>${l.sort((a,b)=>(a.done-b.done)||byPrio(a,b)).map(tkCard).join('')}</div>`).join(''):'<div class="empty">Žádné úkoly. Zkus tlačítko „Nadiktovat“. 🎤</div>'}`;
+}
+
+function vGoals(){
+  const tplDays=DAYS.map((n,i)=>({n,items:S.template.filter(t=>t.dow===i).sort(byTime)}));
+  return `
+  <div class="row"><h1>Cíle</h1><span class="sp"></span><button class="btn pri" data-act="newG">＋ Nový cíl</button></div>
+  <div class="mut" style="margin:6px 0 16px">Tréninky můžeš přiřazovat ke cílům – uvidíš, kolik jich je splněných.</div>
+  ${S.goals.length?`<div class="grid2">${S.goals.map(g=>{
+    const ws=S.workouts.filter(w=>w.goalId===g.id),dn=ws.filter(w=>w.done).length;
+    const left=g.deadline?Math.ceil((pd(g.deadline)-pd(today()))/864e5):null;
+    const sp=SPORTS[g.sport]||SPORTS.other;
+    return `<div class="card goal" style="cursor:pointer" data-act="editG" data-id="${g.id}">
+      <div class="row"><span style="font-size:26px">${sp.i}</span><div class="sp"><h3>${esc(g.title)}</h3><div class="mut small">${esc(g.target||'')}</div></div>${left!=null?`<div style="text-align:right"><b style="font-size:26px">${left}</b><div class="mut small">${left<0?'po termínu':'dní'}</div></div>`:''}</div>
+      ${g.notes?`<div class="small mut" style="margin-top:8px">${esc(g.notes)}</div>`:''}
+      <div class="bar"><i style="width:${ws.length?Math.round(dn/ws.length*100):0}%"></i></div>
+      <div class="small mut" style="margin-top:4px">${dn} z ${ws.length} tréninků splněno</div></div>`}).join('')}</div>`:'<div class="empty">Zatím žádné cíle. Přidej třeba „Půlmaraton pod 2 hodiny“.</div>'}
+  <div class="row sec" style="margin-top:30px"><h2>Týdenní šablona</h2><span class="sp"></span>
+    <label class="chkrow small"><input type="checkbox" data-change="setting" name="autoTemplate" ${S.settings.autoTemplate?'checked':''}> automaticky doplňovat každý týden</label></div>
+  <div class="card">
+    <div class="mut small" style="margin-bottom:12px">Opakující se týdenní kostra tréninků. Aplikace z ní vždy předem vyplní aktuální a příští týden. Plán od ChatGPT šablonu pro daný týden nahradí.</div>
+    <div class="tpl">${tplDays.map(d=>`<div class="dn">${d.n}</div><div>${d.items.map(t=>{const sp=SPORTS[t.sport]||SPORTS.other;return `<div class="item" style="--c:${sp.c};margin-bottom:6px" data-act="editTpl" data-id="${t.id}"><div class="badge">${sp.i}</div><div class="body"><div class="t">${esc(t.title)}</div><div class="m">${t.time?esc(t.time)+' · ':''}${t.durMin?t.durMin+' min':''} ${t.distKm?'· '+t.distKm+' km':''} ${esc(t.intensity||'')}</div></div></div>`}).join('')||'<div class="mut" style="padding:8px 0">–</div>'}</div>`).join('')}</div>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="newTpl">＋ Přidat do šablony</button><button class="btn" data-act="saveTpl">Uložit zobrazený týden jako šablonu</button></div>
+  </div>`;
+}
+
+function vStats(){
+  const cw=mondayOf(today());
+  const weeks=Array.from({length:8},(_,i)=>addDays(cw,-7*(7-i)));
+  const stats=weeks.map(w=>weekStats(w));
+  const mx=Math.max(60,...stats.map(s=>s.doneMin));
+  const cur=stats[7];
+  const used=[...new Set(stats.flatMap(s=>Object.keys(s.bySport)))];
+  const lastDone=S.workouts.filter(w=>w.done).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+  const days7=Array.from({length:7},(_,i)=>addDays(today(),-i));
+  const adh=(()=>{const p=sum(stats.map(s=>s.planned)),d=sum(stats.map(s=>s.done));return p?Math.round(d/p*100):null})();
+  const projStat=S.projects.map(p=>({p,open:S.tasks.filter(t=>t.projectId===p.id&&!t.done).length,done:S.tasks.filter(t=>t.projectId===p.id&&t.done).length})).filter(x=>x.open||x.done);
+  return `
+  <h1>Přehled</h1>
+  <div class="sumbar" style="margin-top:16px">
+    <div class="stat"><b>${cur.done}/${cur.planned}</b><span>tréninky tento týden</span></div>
+    <div class="stat"><b>${cur.doneMin} min</b><span>objem tento týden${cur.km?' · '+r1(cur.km)+' km':''}</span></div>
+    <div class="stat"><b>${adh!=null?adh+' %':'–'}</b><span>plnění plánu (8 týdnů)</span></div>
+    <div class="stat"><b>${cur.rpe!=null?r1(cur.rpe):'–'}</b><span>průměrné RPE týdne</span></div>
+  </div>
+  <div class="card"><h2>Objem za posledních 8 týdnů (min)</h2>
+    <div class="bars">${weeks.map((w,i)=>{const s=stats[i];return `<div class="bar ${i===7?'cur':''}"><div class="stack" style="height:${Math.round(s.doneMin/mx*150)}px">${Object.entries(s.bySport).map(([k,v])=>`<i style="height:${v/Math.max(1,s.doneMin)*100}%;background:${SPORTS[k].c}"></i>`).join('')}</div><span>${s.doneMin}</span><b>${fmtDay(w)}</b></div>`}).join('')}</div>
+    <div class="legend">${used.map(k=>`<span><i style="background:${SPORTS[k].c}"></i>${SPORTS[k].n}</span>`).join('')}</div>
+  </div>
+  <div class="cols2" style="margin-top:14px">
+    <div class="card"><h2>Poslední splněné tréninky</h2>
+      ${lastDone.length?`<table class="t">${lastDone.map(w=>`<tr><td>${fmtDay(w.date)}</td><td>${SPORTS[w.sport].i} ${esc(w.title)}</td><td>${w.aDur||w.durMin||''} min</td><td style="font-size:18px">${w.feel?FEELS[w.feel-1]:''}</td></tr>`).join('')}</table>`:'<div class="mut">Zatím žádné.</div>'}
+    </div>
+    <div class="card"><h2>Strava a zdraví – posledních 7 dní</h2>
+      <table class="t"><tr><th>Den</th><th>kcal</th><th>B / S / T</th><th>Spánek</th><th>Váha</th></tr>
+      ${days7.map(d=>{const n=S.nutrition[d]||{},w=S.wellness[d]||{};return `<tr><td>${fmtDay(d)}</td><td>${n.kcal?Math.round(n.kcal):'–'}</td><td>${n.protein!=null?[n.protein,n.carbs,n.fat].map(x=>Math.round(x||0)).join(' / '):'–'}</td><td>${w.sleepH??'–'}</td><td>${w.weightKg??'–'}</td></tr>`}).join('')}</table>
+    </div>
+  </div>
+  ${projStat.length?`<div class="card" style="margin-top:14px"><h2>Úkoly podle projektů</h2><table class="t"><tr><th>Projekt</th><th>Otevřené</th><th>Hotové</th></tr>${projStat.map(x=>`<tr><td><span class="chip" style="--c:${x.p.color}">${esc(x.p.name)}</span></td><td>${x.open}</td><td>${x.done}</td></tr>`).join('')}</table></div>`:''}`;
+}
+
+function vLink(){
+  const gOn=!!gTok,fileMode=location.protocol==='file:';
+  const lb=S.settings.lastBackup;
+  return `
+  <h1>Propojení a data</h1>
+  <div class="mut" style="margin:6px 0 16px">Aplikace běží jen ve tvém prohlížeči. Data do ní dostaneš nahráním souboru nebo vložením textu.</div>
+  <div class="grid2">
+    ${syncCard()}<div class="card"><h3>🤖 ChatGPT jako trenér a asistent</h3>
+      <p class="mut small">ChatGPT sám do aplikace nezapisuje. Aplikace mu připraví prompt s tvými cíli, historií a pocity, on vrátí JSON a ty ho sem vložíš.</p>
+      <label class="fl">Můj profil a pravidla pro trenéra
+        <textarea data-change="setting" name="coachProfile" placeholder="např. 38 let, běhám 3 roky, můžu trénovat 5× týdně, ráno před prací, bolí mě levé koleno, vybavení: Garmin Forerunner…">${esc(S.settings.coachProfile)}</textarea></label>
+      <div class="row" style="margin-top:10px">
+        <button class="btn pri" data-act="gptTrain" data-w="0">Prompt na tento týden</button>
+        <button class="btn pri" data-act="gptTrain" data-w="1">Prompt na příští týden</button>
+        <button class="btn" data-act="dictate">Prompt pro úkoly…</button>
+      </div>
+      <label class="fl" style="margin-top:14px">Vložit odpověď od ChatGPT (JSON)
+        <textarea id="gptIn" placeholder="Sem vlož celou odpověď ChatGPT, i s kódovým blokem."></textarea></label>
+      <button class="btn pri" style="margin-top:8px" data-act="gptApply">Zkontrolovat a importovat</button>
+    </div>
+    ${svCard()}${importCard()}
+    <div class="card"><h3>📅 Google Kalendář</h3>
+      <p class="mut small"><b>Funguje hned:</b> v Google Kalendáři Nastavení → Import a export → Exportovat, rozbal ZIP a nahraj .ics vlevo. Opačně: exportuj plán do .ics a v Kalendáři ho naimportuj.</p>
+      <div class="row"><button class="btn" data-act="exportICS">⬇ Exportovat plán (.ics)</button>
+        ${S.events.length?`<button class="btn danger" data-act="clearEvents">Smazat importované události (${S.events.length})</button>`:''}</div>
+      <details style="margin-top:14px"><summary>Pokročilé: přímé propojení přes Google (OAuth)</summary>
+        <div class="small mut" style="margin:8px 0">Vyžaduje vlastní „OAuth Client ID“ z Google Cloud Console (Calendar API zapnuté) a stránku otevřenou z http(s) adresy – ze souboru na disku to nejde.${fileMode?' <b style="color:var(--bad)">Teď běžíš ze souboru.</b>':''}</div>
+        <label class="fl">Client ID<input type="text" data-change="setting" name="gcalClientId" value="${esc(S.settings.gcalClientId)}" placeholder="xxxx.apps.googleusercontent.com"></label>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" data-act="gConnect">${gOn?'✓ Připojeno':'Připojit'}</button>
+          <button class="btn" data-act="gPull">Načíst události</button>
+          <button class="btn" data-act="gPush">Odeslat tréninky</button></div>${gCalPicker()}${gGuide()}
+        <div class="small mut" style="margin-top:6px">Do kalendáře se odesílají tréninky a úkoly s časem. Znovu odeslání položky aktualizuje, nevytváří duplikáty.</div>
+      </details>
+    </div>
+    <div class="card"><h3>⚙️ Nastavení a záloha</h3>
+      <div class="f2">
+        <label class="fl">Jak ti říkat<input type="text" data-change="setting" name="name" value="${esc(S.settings.name)}"></label>
+        <label class="fl">Pracovních hodin denně<input type="number" step="0.5" min="1" max="12" data-change="setting" name="workHours" value="${S.settings.workHours}"></label>
+        <label class="fl">Denní cíl kcal<input type="number" min="0" data-change="setting" name="kcalGoal" value="${esc(S.settings.kcalGoal??'')}"></label>
+        <label class="fl">Denní cíl bílkovin (g)<input type="number" min="0" data-change="setting" name="proteinGoal" value="${esc(S.settings.proteinGoal??'')}"></label>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn pri" data-act="exportBackup">💾 Stáhnout zálohu (.json)</button>
+      </div>
+      <div class="mut small" style="margin-top:6px">${lb?'Poslední záloha: '+new Date(lb).toLocaleDateString('cs-CZ'):'Zatím nezálohováno.'} Data jsou v prohlížeči – zálohu ukládej třeba na Google Disk a občas obnov.</div>
+      <hr style="margin:14px 0">
+      <div class="row"><button class="btn danger sm" data-act="resetAll">Smazat všechna data</button></div>
+    </div>
+  </div>`;
+}
+
+const VIEWS={dnes:vToday,tyden:vWeek,ukoly:vTasks,cile:vGoals,prehled:vStats,propojeni:vLink};
+function applyTheme(){document.documentElement.dataset.theme=S.settings.theme||'graphite'}
+function render(){
+  if(!VIEWS[view])view='dnes';
+  ensureWeek(mondayOf(today()));ensureWeek(addDays(mondayOf(today()),7));
+  if(view==='tyden')ensureWeek(curWeek);
+  const sc=window.scrollY;
+  const label=(NAV.find(n=>n[0]===view)||[])[1]||'';
+  const cur=S.settings.theme||'graphite';
+  const themes=`<div class="themes">${THEMES.map(([k,c])=>`<button class="${cur===k?'on':''}" style="background:${c}" data-act="theme" data-v="${k}" title="Barevné téma"></button>`).join('')}</div>`;
+  const nOpen=id=>S.tasks.filter(t=>!t.done&&t.projectId===id).length;
+  $('#app').innerHTML=`<div class="shell">
+    <aside class="side">
+      <div class="brand"><div class="lock"><span class="logo">${LOGO}</span><b>mywall.</b></div><span class="slogan">your space. your pace.</span></div>
+      <div class="sidesec">Přehled</div>
+      <nav class="tabs">${NAV.map(([k,l,i])=>`<button class="${k===view?'on':''}" data-act="nav" data-v="${k}"><span class="ic">${i}</span>${l}</button>`).join('')}</nav>
+      <div class="sidesec"><span>Projekty</span><button data-act="projects" title="Spravovat projekty">＋</button></div>
+      <div class="sideproj">${S.projects.map(p=>`<button data-act="tfilterNav" data-v="${p.id}"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}<em>${nOpen(p.id)}</em></button>`).join('')||'<div class="none">Přidej první projekt.</div>'}</div>
+      <div class="sidefoot">${themes}<div class="small" data-syncstat>${esc(syncLabel())}</div></div>
+    </aside>
+    <div class="mainwrap">
+      <div class="mtop"><div class="brand"><div class="lock"><span class="logo">${LOGO}</span><b>mywall.</b></div></div>${themes}</div>
+      <div class="crumbbar"><span style="text-transform:none;letter-spacing:.02em">mywall.</span><span>/</span><b>${esc(label)}</b><span class="sp"></span><span class="sync" data-syncstat>${esc(syncLabel())}</span><button class="btn sm" data-act="exportBackup">Záloha</button></div>
+      <main>${backupBanner()}${VIEWS[view]()}</main>
+    </div>
+  </div>`;
+  window.scrollTo(0,sc);
+}
+
+/* =====================  MODALY  ===================== */
+let pend=null,pv=null,rec=null;
+function openModal(html){
+  closeModal();
+  const r=document.createElement('div');r.className='ov';
+  r.innerHTML=`<div class="modal">${html}</div>`;
+  r.addEventListener('mousedown',e=>{if(e.target===r)closeModal()});
+  $('#modal-root').appendChild(r);
+  const f=r.querySelector('[autofocus]');if(f)f.focus();
+}
+function closeModal(){
+  if(rec){try{rec.stop()}catch(e){}rec=null}
+  $('#modal-root').innerHTML='';
+  if(needRender){needRender=false;setTimeout(render,0)}
+}
+const optList=(v,arr)=>arr.map(([k,l])=>`<option value="${esc(k)}" ${String(v??'')===String(k)?'selected':''}>${esc(l)}</option>`).join('');
+const sportOpts=v=>optList(v,Object.entries(SPORTS).map(([k,s])=>[k,s.i+' '+s.n]));
+
+function openWorkout(id,focusActual,preset){
+  const w=id?wkById(id):Object.assign({id:'',date:today(),time:'',sport:'run',title:'',description:'',durMin:'',distKm:'',intensity:'',goalId:'',done:false},preset||{});
+  if(!w){return}
+  openModal(`<h2 class="mt">${id?'Trénink':'Nový trénink'}</h2>
+  <form class="f" data-submit="saveW"><input type="hidden" name="id" value="${esc(w.id)}">
+    <div class="f2"><label class="fl">Datum<input type="date" name="date" value="${esc(w.date)}" required></label>
+      <label class="fl">Čas (nepovinné)<input type="time" name="time" value="${esc(w.time)}"></label></div>
+    <div class="f2"><label class="fl">Sport<select name="sport">${sportOpts(w.sport)}</select></label>
+      <label class="fl">Cíl<select name="goalId"><option value="">–</option>${optList(w.goalId,S.goals.map(g=>[g.id,g.title]))}</select></label></div>
+    <label class="fl">Název<input type="text" name="title" value="${esc(w.title)}" placeholder="např. Klidný běh Z2" ${focusActual?'':'autofocus'}></label>
+    <label class="fl">Popis tréninku<textarea name="description" placeholder="rozcvička, hlavní část, výklus…">${esc(w.description)}</textarea></label>
+    <div class="f3"><label class="fl">Plán – minuty<input type="number" name="durMin" min="0" value="${esc(w.durMin??'')}"></label>
+      <label class="fl">Plán – km<input type="number" step="0.01" name="distKm" value="${esc(w.distKm??'')}"></label>
+      <label class="fl">Intenzita<input type="text" name="intensity" value="${esc(w.intensity)}" placeholder="Z2, tempo…"></label></div>
+    <hr><h3 id="actual">Jak to proběhlo${w.source?` <span class="chip" style="--c:var(--acc)">${esc(w.source)}</span>`:''}</h3>
+    <label class="chkrow"><input type="checkbox" name="done" ${w.done?'checked':''}> Splněno</label>
+    <div class="f3"><label class="fl">Skutečně minut<input type="number" name="aDur" value="${esc(w.aDur??'')}"></label>
+      <label class="fl">Skutečně km<input type="number" step="0.01" name="aDist" value="${esc(w.aDist??'')}"></label>
+      <label class="fl">Průměrná TF<input type="number" name="aHr" value="${esc(w.aHr??'')}"></label></div>
+    <div class="f2"><label class="fl">Max TF<input type="number" name="aMaxHr" value="${esc(w.aMaxHr??'')}"></label>
+      <label class="fl">Náročnost RPE (1–10)<select name="rpe"><option value="">–</option>${optList(w.rpe,Array.from({length:10},(_,i)=>[i+1,String(i+1)]))}</select></label></div>
+    <div><div class="fl" style="margin-bottom:6px">Jak ses cítila</div>
+      <div class="pills"><label><input type="radio" name="feel" value="" ${!w.feel?'checked':''}><span>–</span></label>${FEELS.map((e,i)=>`<label><input type="radio" name="feel" value="${i+1}" ${w.feel===i+1?'checked':''}><span>${e}</span></label>`).join('')}</div></div>
+    <label class="fl">Bolest / zdravotní potíže<input type="text" name="pain" value="${esc(w.pain||'')}" placeholder="např. tahá lýtko, únava v nohách"></label>
+    <label class="fl">Poznámky<textarea name="notes" placeholder="Jak to šlo, co fungovalo, co příště jinak…">${esc(w.notes||'')}</textarea></label>
+    ${id&&w.done?`<div class="pv"><div class="small"><b>Vyhodnocení:</b> ${esc(evaluateWorkout(w)||'doplň údaje o tréninku')}</div>${w.aiEval?`<div class="small" style="margin-top:8px"><b>🤖 AI:</b> ${esc(w.aiEval)}</div>`:''}<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-act="aiEval" data-id="${id}">🤖 Vyhodnotit pomocí AI</button><button type="button" class="btn sm" data-act="aiPrompt" data-id="${id}">Prompt pro ChatGPT</button></div></div>`:''}
+    <div class="row"><button class="btn pri" type="submit">Uložit</button><button class="btn" type="button" data-act="closeModal">Zrušit</button><span class="sp"></span>
+      ${id?`<button class="btn" type="button" data-act="dupW" data-id="${id}">Duplikovat</button><button class="btn danger" type="button" data-act="delW" data-id="${id}">Smazat</button>`:''}</div>
+  </form>`);
+  if(focusActual)setTimeout(()=>{const a=$('#actual');if(a)a.scrollIntoView({block:'start'})},0);
+}
+function openTask(id,preset){
+  const t=id?tkById(id):Object.assign({id:'',title:'',projectId:'',prio:2,due:'',date:'',time:'',est:30,notes:'',done:false},preset||{});
+  if(!t)return;
+  openModal(`<h2 class="mt">${id?'Úkol':'Nový úkol'}</h2>
+  <form class="f" data-submit="saveT"><input type="hidden" name="id" value="${esc(t.id)}">
+    <label class="fl">Co je potřeba udělat<input type="text" name="title" value="${esc(t.title)}" required autofocus></label>
+    <div class="f2"><label class="fl">Projekt<select name="projectId"><option value="">– nezařazeno –</option>${optList(t.projectId,S.projects.map(p=>[p.id,p.name]))}</select></label>
+      <label class="fl">Priorita<select name="prio">${optList(t.prio||2,[[1,'🔴 Vysoká'],[2,'🟡 Střední'],[3,'⚪ Nízká']])}</select></label></div>
+    <div class="f3"><label class="fl">Termín (deadline)<input type="date" name="due" value="${esc(t.due)}"></label>
+      <label class="fl">Udělat v den<input type="date" name="date" value="${esc(t.date)}"></label>
+      <label class="fl">Čas<input type="time" name="time" value="${esc(t.time)}"></label></div>
+    <label class="fl">Odhad (minuty)<input type="number" name="est" min="0" value="${esc(t.est??'')}"></label>
+    <label class="fl">Poznámky<textarea name="notes">${esc(t.notes||'')}</textarea></label>
+    <label class="chkrow"><input type="checkbox" name="done" ${t.done?'checked':''}> Hotovo</label>
+    <div class="row"><button class="btn pri" type="submit">Uložit</button><button class="btn" type="button" data-act="closeModal">Zrušit</button><span class="sp"></span>
+      ${id?`<button class="btn danger" type="button" data-act="delT" data-id="${id}">Smazat</button>`:''}</div>
+  </form>`);
+}
+function openGoal(id){
+  const g=id?goal(id):{id:'',title:'',sport:'run',target:'',deadline:'',notes:''};
+  openModal(`<h2 class="mt">${id?'Cíl':'Nový cíl'}</h2>
+  <form class="f" data-submit="saveG"><input type="hidden" name="id" value="${esc(g.id)}">
+    <label class="fl">Název cíle<input type="text" name="title" value="${esc(g.title)}" placeholder="např. Půlmaraton v Praze" required autofocus></label>
+    <div class="f2"><label class="fl">Sport<select name="sport">${sportOpts(g.sport)}</select></label>
+      <label class="fl">Termín<input type="date" name="deadline" value="${esc(g.deadline)}"></label></div>
+    <label class="fl">Konkrétní cíl<input type="text" name="target" value="${esc(g.target)}" placeholder="např. pod 2:00, 10 km bez zastavení…"></label>
+    <label class="fl">Jak podle něj skládám tréninky<textarea name="notes" placeholder="např. 3× běh týdně, 1× dlouhý v neděli, 1× síla, každý 4. týden odlehčený">${esc(g.notes)}</textarea></label>
+    <div class="row"><button class="btn pri" type="submit">Uložit</button><button class="btn" type="button" data-act="closeModal">Zrušit</button><span class="sp"></span>
+      ${id?`<button class="btn danger" type="button" data-act="delG" data-id="${id}">Smazat</button>`:''}</div>
+  </form>`);
+}
+function openTpl(id){
+  const t=id?S.template.find(x=>x.id===id):{id:'',dow:0,time:'',sport:'run',title:'',description:'',durMin:'',distKm:'',intensity:'',goalId:''};
+  openModal(`<h2 class="mt">${id?'Položka šablony':'Nová položka šablony'}</h2>
+  <form class="f" data-submit="saveTpl"><input type="hidden" name="id" value="${esc(t.id)}">
+    <div class="f2"><label class="fl">Den v týdnu<select name="dow">${optList(t.dow,DAYS.map((d,i)=>[i,d]))}</select></label>
+      <label class="fl">Čas<input type="time" name="time" value="${esc(t.time||'')}"></label></div>
+    <div class="f2"><label class="fl">Sport<select name="sport">${sportOpts(t.sport)}</select></label>
+      <label class="fl">Cíl<select name="goalId"><option value="">–</option>${optList(t.goalId,S.goals.map(g=>[g.id,g.title]))}</select></label></div>
+    <label class="fl">Název<input type="text" name="title" value="${esc(t.title)}" required autofocus></label>
+    <label class="fl">Popis<textarea name="description">${esc(t.description||'')}</textarea></label>
+    <div class="f3"><label class="fl">Minuty<input type="number" name="durMin" value="${esc(t.durMin??'')}"></label>
+      <label class="fl">Km<input type="number" step="0.01" name="distKm" value="${esc(t.distKm??'')}"></label>
+      <label class="fl">Intenzita<input type="text" name="intensity" value="${esc(t.intensity||'')}"></label></div>
+    <div class="row"><button class="btn pri" type="submit">Uložit</button><button class="btn" type="button" data-act="closeModal">Zrušit</button><span class="sp"></span>
+      ${id?`<button class="btn danger" type="button" data-act="delTpl" data-id="${id}">Smazat</button>`:''}</div>
+  </form>`);
+}
+function openProjects(){
+  openModal(`<h2 class="mt">Projekty</h2>
+  <p class="mut small">Klíčová slova (oddělená čárkou) pomáhají při diktování zařadit úkol do správného projektu. Stačí kmen slova – „faktur“ chytí fakturu, faktury i fakturaci. Aplikace se učí i z tvých oprav.</p>
+  <form data-submit="saveProjects">
+    ${S.projects.map(p=>`<div class="prow" data-pid="${p.id}"><input type="color" name="color" value="${esc(p.color)}"><input type="text" name="name" value="${esc(p.name)}" placeholder="Název projektu"><input type="text" name="kw" value="${esc((p.keywords||[]).join(', '))}" placeholder="klíčová slova: klient, nabídka, smlouva"><button type="button" class="btn ghost danger" data-act="delP" data-id="${p.id}" title="Smazat">✕</button></div>`).join('')}
+    <div class="row" style="margin-top:12px"><button class="btn pri" type="submit">Uložit</button><button class="btn" type="button" data-act="addP">＋ Projekt</button><button class="btn" type="button" data-act="closeModal">Zavřít</button></div>
+  </form>`);
+}
+function openPrompt(title,text,hint){
+  openModal(`<h2 class="mt">${esc(title)}</h2>
+  <p class="mut small">${esc(hint===undefined?'Zkopíruj celý text, vlož ho do ChatGPT a odpověď (JSON) pak vlož zpět do aplikace v sekci Propojení.':hint)}</p>
+  <textarea id="promptTxt" readonly style="min-height:300px;font-size:13px">${esc(text)}</textarea>
+  <div class="row" style="margin-top:12px"><button class="btn pri" data-act="copyPrompt">📋 Zkopírovat</button><button class="btn" data-act="closeModal">Zavřít</button></div>`);
+}
+function openDictate(prefill){
+  openModal(`<h2 class="mt">🎤 Nadiktuj nebo napiš plán</h2>
+  <p class="mut small">Úkoly i tréninky dohromady, jak ti to napadá – třeba „v úterý klidný běh 50 minut, ve čtvrtek tempo 10 km, do pátku připravit nabídku pro klienta, urgentní“. Aplikace text rozdělí, pozná, co je trénink a co úkol, roztřídí to a před uložením se zeptá.</p>
+  <textarea id="dictText" style="min-height:170px" placeholder="Po: klidný běh 50 minut v zóně 2&#10;Út: posilovna 45 minut&#10;Čt: intervaly 6× 800 m&#10;Zavolat Novákovi ohledně smlouvy do pátku. Připravit prezentaci pro vedení na úterý, je to důležité.">${esc(prefill||'')}</textarea>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" data-act="mic" id="micBtn">🎤 Diktovat</button>
+    <select id="dictMode" style="width:auto"><option value="auto">Rozpoznat automaticky</option><option value="task">Jen úkoly</option><option value="workout">Jen tréninky (1 řádek = 1 trénink)</option></select>
+    <button class="btn pri" data-act="analyze">Vyhodnotit</button><span class="sp"></span>
+    <button class="btn sm" data-act="gptTaskPrompt">Prompt pro ChatGPT</button></div>
+  <details style="margin-top:14px"><summary>Mám odpověď od ChatGPT (JSON)</summary>
+    <textarea id="gptTasks" style="margin-top:8px" placeholder="Vlož odpověď ChatGPT"></textarea>
+    <button class="btn sm" style="margin-top:8px" data-act="gptTasksApply">Načíst</button></details>`);
+  setTimeout(()=>{const a=$('#dictText');if(a)a.focus()},0);
+}
+function openTaskPreview(items){
+  pv=items;
+  const nt=items.filter(i=>(i.kind||'task')==='task').length,nw=items.length-nt;
+  openModal(`<h2 class="mt">Zkontroluj a uprav</h2>
+  <p class="mut small">Rozpoznáno: ${nt} ${nt===1?'úkol':nt<5&&nt>0?'úkoly':'úkolů'} a ${nw} ${nw===1?'trénink':nw<5&&nw>0?'tréninky':'tréninků'}. Druh můžeš u každé položky přepnout. Přeřazením úkolu do jiného projektu aplikaci „naučíš“ třídit příště sama.</p>
+  <div id="pvList">${items.map((it,i)=>{
+    const kind=it.kind||'task';
+    const pid=it.projectId||(it.projName?(S.projects.find(p=>norm(p.name).trim()===norm(it.projName).trim())||{}).id:'')||'';
+    it.projectId=pid;
+    const wdate=it.date||it.due||'';
+    return `<div class="pv" data-i="${i}" data-kind="${kind}">
+    <div class="row" style="flex-wrap:nowrap"><input type="checkbox" class="pvOn" checked>
+      <select class="pvKind" data-change="pvKind" style="width:auto;flex:none"><option value="task" ${kind==='task'?'selected':''}>✅ Úkol</option><option value="workout" ${kind==='workout'?'selected':''}>🏃 Trénink</option></select>
+      <input type="text" class="pvTitle" value="${esc(it.title)}"></div>
+    <div class="f3 tk-only" style="margin-top:8px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+      <label class="fl">Projekt<select class="pvProj"><option value="">– nezařazeno –</option>${optList(pid,S.projects.map(p=>[p.id,p.name]))}${!pid&&it.projName?`<option value="__new" selected>＋ nový: ${esc(it.projName)}</option>`:''}</select></label>
+      <label class="fl">Priorita<select class="pvPrio">${optList(it.prio||2,[[1,'🔴 Vysoká'],[2,'🟡 Střední'],[3,'⚪ Nízká']])}</select></label>
+      <label class="fl">Termín<input type="date" class="pvDue" value="${esc(it.due||'')}"></label>
+      <label class="fl">Udělat v den<input type="date" class="pvDate" value="${esc(it.date||'')}"></label>
+    </div>
+    <div class="f3 wk-only" style="margin-top:8px;grid-template-columns:repeat(auto-fit,minmax(110px,1fr))">
+      <label class="fl">Sport<select class="pvSport">${sportOpts(it.sport||'other')}</select></label>
+      <label class="fl">Den<input type="date" class="pvWDate" value="${esc(wdate)}"></label>
+      <label class="fl">Čas<input type="time" class="pvWTime" value="${esc(it.time||'')}"></label>
+      <label class="fl">Minuty<input type="number" class="pvDur" value="${esc(it.durMin??'')}"></label>
+      <label class="fl">Km<input type="number" step="0.01" class="pvDist" value="${esc(it.distKm??'')}"></label>
+      <label class="fl">Intenzita<input type="text" class="pvInt" value="${esc(it.intensity||'')}"></label>
+    </div>
+    ${it.why&&it.why.length?`<div class="small mut" style="margin-top:6px">Proč: ${esc(it.why.join(' · '))}</div>`:''}</div>`}).join('')}</div>
+  <div class="row" style="margin-top:12px"><button class="btn pri" data-act="pvAdd" data-s="0">Přidat vše</button><button class="btn" data-act="pvAdd" data-s="1">Přidat a rozvrhnout úkoly do týdne</button><button class="btn" data-act="closeModal">Zrušit</button></div>`);
+}
+
+/* =====================  AKCE  ===================== */
+const ACT={
+  nav(el){view=el.dataset.v;location.hash=view;render();window.scrollTo(0,0)},
+  theme(el){S.settings.theme=el.dataset.v;save();applyTheme();render()},
+  closeModal(){closeModal()},
+  applyPending(){const p=pend;pend=null;closeModal();if(p)p.apply()},
+  wkPrev(){curWeek=addDays(curWeek,-7);render()},
+  wkNext(){curWeek=addDays(curWeek,7);render()},
+  wkToday(){curWeek=mondayOf(today());render()},
+  newW(el){openWorkout(null,false,{date:el.dataset.date||today()})},
+  editW(el){openWorkout(el.dataset.id)},
+  togW(el){const w=wkById(el.dataset.id);if(!w)return;w.done=!w.done;save();render();if(w.done)openWorkout(w.id,true)},
+  dupW(el){const w=wkById(el.dataset.id);if(!w)return;const c=Object.assign({},w,{id:uid(),done:false,aDur:null,aDist:null,aHr:null,aMaxHr:null,rpe:null,feel:null,pain:'',notes:'',source:'',ext:'',gcalId:'',tplId:''});S.workouts.push(c);save();closeModal();render();toast('Trénink zduplikován')},
+  delW(el){if(confirm('Smazat tento trénink?')){S.workouts=S.workouts.filter(w=>w.id!==el.dataset.id);save();closeModal();render()}},
+  newT(el){openTask(null,{date:el.dataset.date||''})},
+  editT(el){openTask(el.dataset.id)},
+  togT(el){const t=tkById(el.dataset.id);if(!t)return;t.done=!t.done;t.doneAt=t.done?Date.now():null;save();render()},
+  delT(el){if(confirm('Smazat tento úkol?')){S.tasks=S.tasks.filter(t=>t.id!==el.dataset.id);save();closeModal();render()}},
+  tfilter(el){tFilter=el.dataset.v;render()},
+  tfilterNav(el){tFilter=el.dataset.v;view='ukoly';location.hash='ukoly';render();window.scrollTo(0,0)},
+  newG(){openGoal(null)},
+  editG(el){openGoal(el.dataset.id)},
+  delG(el){if(confirm('Smazat cíl? Tréninky zůstanou.')){S.goals=S.goals.filter(g=>g.id!==el.dataset.id);save();closeModal();render()}},
+  newTpl(){openTpl(null)},
+  editTpl(el){openTpl(el.dataset.id)},
+  delTpl(el){S.template=S.template.filter(t=>t.id!==el.dataset.id);save();closeModal();render()},
+  saveTpl(){
+    const ws=S.workouts.filter(w=>w.date>=curWeek&&w.date<=addDays(curWeek,6));
+    if(!ws.length){toast('Zobrazený týden nemá žádné tréninky.');return}
+    if(S.template.length&&!confirm('Přepsat stávající šablonu tréninky z tohoto týdne?'))return;
+    S.template=ws.map(w=>({id:uid(),dow:dow(w.date),time:w.time||'',sport:w.sport,title:w.title,description:w.description||'',durMin:w.durMin||w.aDur||null,distKm:w.distKm||null,intensity:w.intensity||'',goalId:w.goalId||''}));
+    save();render();toast('Šablona uložena ('+S.template.length+' položek)');
+  },
+  fromTpl(){
+    if(!S.template.length){toast('Nejdřív si vytvoř šablonu v záložce Cíle.');return}
+    const n=genFromTemplate(curWeek);if(!S.generatedWeeks.includes(curWeek))S.generatedWeeks.push(curWeek);save();render();
+    toast(n?`Doplněno ${n} tréninků ze šablony`:'Vše ze šablony už v týdnu je');
+  },
+  copyPrev(){
+    const prev=addDays(curWeek,-7);let n=0;
+    S.workouts.filter(w=>w.date>=prev&&w.date<=addDays(prev,6)).forEach(w=>{
+      const date=addDays(w.date,7);
+      if(S.workouts.some(x=>x.date===date&&norm(x.title)===norm(w.title)))return;
+      S.workouts.push({id:uid(),date,time:w.time,sport:w.sport,title:w.title,description:w.description,durMin:w.durMin||w.aDur||null,distKm:w.distKm||null,intensity:w.intensity,goalId:w.goalId,done:false});n++;
+    });
+    if(!S.generatedWeeks.includes(curWeek))S.generatedWeeks.push(curWeek);
+    save();render();toast(n?`Zkopírováno ${n} tréninků`:'Minulý týden nemá co kopírovat');
+  },
+  schedule(){const n=autoSchedule(view==='tyden'?curWeek:mondayOf(today()));render();toast(n?`Rozvrženo ${n} úkolů do týdne podle priorit, termínů a kalendáře`:'Není co rozvrhovat (všechny úkoly mají den nebo nejsou termínově v tomto týdnu)')},
+  projects(){openProjects()},
+  addP(){
+    syncProjects();
+    S.projects.push({id:uid(),name:'Nový projekt',color:colorFor(),keywords:[]});save();openProjects();
+  },
+  delP(el){
+    if(!confirm('Smazat projekt? Úkoly zůstanou jako nezařazené.'))return;
+    syncProjects();
+    S.projects=S.projects.filter(p=>p.id!==el.dataset.id);S.tasks.forEach(t=>{if(t.projectId===el.dataset.id)t.projectId=''});save();openProjects();render();
+  },
+  dictate(){openDictate('')},
+  mic(el){
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){toast('Tento prohlížeč diktování nepodporuje – použij Chrome/Edge, nebo mikrofon na klávesnici telefonu.');return}
+    const ta=$('#dictText');
+    if(rec){rec.stop();return}
+    rec=new SR();rec.lang='cs-CZ';rec.continuous=true;rec.interimResults=true;
+    const base=ta.value.trim();
+    el.textContent='⏹ Zastavit';
+    rec.onresult=e=>{
+      const parts=[];
+      for(let i=0;i<e.results.length;i++)parts.push(e.results[i][0].transcript.trim());
+      ta.value=(base?base+'\n':'')+parts.join('\n');
+    };
+    rec.onerror=e=>{toast('Mikrofon: '+(e.error==='not-allowed'?'chybí povolení k mikrofonu':e.error))};
+    rec.onend=()=>{rec=null;const b=$('#micBtn');if(b)b.textContent='🎤 Diktovat'};
+    rec.start();
+  },
+  analyze(){
+    const txt=($('#dictText')||{}).value||'';
+    const items=parseDictation(txt,($('#dictMode')||{}).value||'auto');
+    if(!items.length){toast('Nenašla jsem v textu žádný úkol ani trénink.');return}
+    openTaskPreview(items);
+  },
+  gptTaskPrompt(){openPrompt('Prompt pro ChatGPT – roztřídění úkolů',buildTaskPrompt(($('#dictText')||{}).value||''))},
+  gptTasksApply(){
+    const t=($('#gptTasks')||{}).value||'';
+    handleText(t,'',true);
+  },
+  pvAdd(el){
+    const rows=[...document.querySelectorAll('#pvList .pv')];
+    let nt=0,nw=0;const learned=[];
+    rows.forEach(r=>{
+      if(!r.querySelector('.pvOn').checked)return;
+      const it=pv[+r.dataset.i];
+      const title=r.querySelector('.pvTitle').value.trim();if(!title)return;
+      if(r.dataset.kind==='workout'){
+        addWorkoutItem({title,date:r.querySelector('.pvWDate').value,time:r.querySelector('.pvWTime').value,sport:r.querySelector('.pvSport').value,
+          durMin:num(r.querySelector('.pvDur').value),distKm:num(r.querySelector('.pvDist').value),intensity:r.querySelector('.pvInt').value.trim(),desc:it.desc||''});
+        nw++;return;
+      }
+      let pid=r.querySelector('.pvProj').value;
+      if(pid==='__new')pid=projIdByName(it.projName);
+      if(pid&&pid!==it.sugg&&!it.projName){const a=learn(title,pid);if(a.length)learned.push(...a)}
+      S.tasks.push({id:uid(),title,projectId:pid,prio:+r.querySelector('.pvPrio').value||2,due:r.querySelector('.pvDue').value,date:r.querySelector('.pvDate').value,time:it.time||'',est:it.est||30,notes:it.notes||'',done:false,created:Date.now()});
+      nt++;
+    });
+    save();closeModal();
+    if(el.dataset.s==='1'&&nt)autoSchedule(view==='tyden'?curWeek:mondayOf(today()));
+    render();
+    toast(`Přidáno: ${nt} úkolů, ${nw} tréninků${el.dataset.s==='1'&&nt?' (úkoly rozvrženy)':''}${learned.length?' · naučeno: '+learned.slice(0,4).join(', '):''}`);
+  },
+  gptTrain(el){const base=mondayOf(today());openPrompt('Prompt pro ChatGPT – tréninkový plán',buildTrainingPrompt(addDays(base,7*+el.dataset.w)))},
+  gptApply(){handleText(($('#gptIn')||{}).value||'','')},
+  pasteApply(){handleText(($('#pasteIn')||{}).value||'','')},
+  copyPrompt(){
+    const ta=$('#promptTxt');ta.select();
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(ta.value).then(()=>toast('Zkopírováno ✓'),()=>{document.execCommand('copy');toast('Zkopírováno ✓')});
+    else{document.execCommand('copy');toast('Zkopírováno ✓')}
+  },
+  exportICS(){exportICS()},
+  clearEvents(){if(confirm('Smazat všechny importované události z kalendáře?')){S.events=[];S.eventsU=Date.now();save();render()}},
+  gConnect(){gConnect()},gPull(){gPull()},gPush(){gPush()},
+  exportBackup(){S.settings.lastBackup=Date.now();save();download(`mywall-zaloha-${today()}.json`,JSON.stringify(S,null,1),'application/json');render();toast('Záloha stažena')},
+  resetAll(){if(confirm('Opravdu smazat VŠECHNA data v aplikaci? Pokud je zapnutá synchronizace, smažou se i v cloudu. Nejdřív si stáhni zálohu.')&&confirm('Naposledy: smazat úplně všechno?')){S=defaults();save();render()}},
+  demo(){loadDemo()},
+  syncOn(){syncOn()},syncNow(){syncNow(true)},syncCode(){syncCode()},syncJoin(){syncJoin()},syncOff(){syncOff()},
+  gptNutri(){openPrompt('Prompt pro ChatGPT – odhad jídla',buildNutritionPrompt())},gCalsLoad(){gLoadCals()},
+  stravaConnect(){stravaConnect()},stravaSync(){stravaSync(true)},stravaOff(){stravaOff()},
+  aiEval(el){aiEvalWorkout(el.dataset.id).catch(e=>toast(e.message))},
+  aiPrompt(el){const w=wkById(el.dataset.id);if(w)openPrompt('Prompt pro ChatGPT – vyhodnocení tréninku',buildEvalPrompt(w))}
+};
+function syncProjects(){
+  document.querySelectorAll('.prow').forEach(r=>{
+    const p=proj(r.dataset.pid);if(!p)return;
+    p.name=r.querySelector('[name=name]').value.trim()||p.name;
+    p.color=r.querySelector('[name=color]').value;
+    p.keywords=r.querySelector('[name=kw]').value.split(',').map(s=>s.trim()).filter(Boolean);
+  });
+}
+
+const SUB={
+  saveW(f,fd){
+    const g=k=>fd.get(k)||'';
+    let w=g('id')?wkById(g('id')):null;
+    if(!w){w={id:uid()};S.workouts.push(w)}
+    Object.assign(w,{date:g('date'),time:g('time'),sport:g('sport'),goalId:g('goalId'),title:g('title').trim(),description:g('description').trim(),
+      durMin:num(g('durMin')),distKm:num(g('distKm')),intensity:g('intensity').trim(),
+      done:fd.has('done'),aDur:num(g('aDur')),aDist:num(g('aDist')),aHr:num(g('aHr')),aMaxHr:num(g('aMaxHr')),rpe:num(g('rpe')),feel:num(g('feel')),pain:g('pain').trim(),notes:g('notes').trim()});
+    if(!w.done&&(w.aDur||w.aDist||w.feel))w.done=true;
+    if(!w.title)w.title=SPORTS[w.sport].n;
+    save();closeModal();render();
+  },
+  saveT(f,fd){
+    const g=k=>fd.get(k)||'';
+    let t=g('id')?tkById(g('id')):null;
+    if(!t){t={id:uid(),created:Date.now()};S.tasks.push(t)}
+    const wasDone=t.done;
+    Object.assign(t,{title:g('title').trim(),projectId:g('projectId'),prio:+g('prio')||2,due:g('due'),date:g('date'),time:g('time'),est:num(g('est')),notes:g('notes').trim(),done:fd.has('done')});
+    if(t.done&&!wasDone)t.doneAt=Date.now();
+    save();closeModal();render();
+  },
+  saveG(f,fd){
+    const g=k=>fd.get(k)||'';
+    let o=g('id')?goal(g('id')):null;
+    if(!o){o={id:uid(),done:false};S.goals.push(o)}
+    Object.assign(o,{title:g('title').trim(),sport:g('sport'),target:g('target').trim(),deadline:g('deadline'),notes:g('notes').trim()});
+    save();closeModal();render();
+  },
+  saveTpl(f,fd){
+    const g=k=>fd.get(k)||'';
+    let o=g('id')?S.template.find(x=>x.id===g('id')):null;
+    if(!o){o={id:uid()};S.template.push(o)}
+    Object.assign(o,{dow:+g('dow'),time:g('time'),sport:g('sport'),goalId:g('goalId'),title:g('title').trim(),description:g('description').trim(),durMin:num(g('durMin')),distKm:num(g('distKm')),intensity:g('intensity').trim()});
+    save();closeModal();render();
+  },
+  saveProjects(){syncProjects();save();closeModal();render();toast('Projekty uloženy')}
+};
+const CHG={
+  setting(el){
+    S.settings[el.name]=el.type==='checkbox'?el.checked:el.type==='number'?num(el.value):el.value;if(SYNC_SET.includes(el.name))S.settings._u=Date.now();
+    save();
+    if(el.name==='autoTemplate'||el.name==='name')render();
+  },
+  daily(el){
+    const t=today(),v=num(el.value);
+    const tgt=['kcal','protein'].includes(el.name)?S.nutrition:S.wellness;
+    const o=tgt[t]||(tgt[t]={});
+    if(v==null)delete o[el.name];else o[el.name]=v;
+    save();
+  },
+  showDone(el){showDone=el.checked;render()},
+  pvKind(el){el.closest('.pv').dataset.kind=el.value},
+  aiSet(el){const c=aiCfg();c[el.name]=el.type==='checkbox'?el.checked:el.value;aiSave(c);if(el.name==='provider')render()},
+  gcalSel(el){const s=gcalSel();gcalSet(el.checked?[...new Set([...s,el.value])]:s.filter(x=>x!==el.value))},
+  file(el){const fl=[...(el.files||[])];el.value='';if(fl.length)importFiles(fl)}
+};
+
+/* =====================  UDÁLOSTI  ===================== */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const f=ACT[el.dataset.act];
+  if(f){e.preventDefault();f(el,e)}
+});
+document.addEventListener('submit',e=>{
+  const f=e.target.closest('form[data-submit]');if(!f)return;
+  e.preventDefault();
+  const fn=SUB[f.dataset.submit];if(fn)fn(f,new FormData(f));
+});
+document.addEventListener('change',e=>{
+  const el=e.target;if(!el.dataset||!el.dataset.change)return;
+  const f=CHG[el.dataset.change];if(f)f(el,e);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-quick]')){
+    const v=e.target.value.trim();if(!v)return;
+    const items=parseDictation(v);
+    const it=items[0]||{title:v,projectId:'',prio:2,due:'',date:'',time:'',est:30};
+    if(it.kind==='workout'){addWorkoutItem(it);save();render();toast('Přidán trénink: '+it.title+(it.date?' · '+fmtDay(it.date):''));return}
+    S.tasks.push({id:uid(),title:it.title,projectId:it.projectId,prio:it.prio,due:it.due,date:it.date||(view==='dnes'&&!it.due?today():''),time:it.time,est:it.est,notes:'',done:false,created:Date.now()});
+    save();render();
+    const p=proj(it.projectId);
+    toast(`Přidáno${p?' do projektu '+p.name:''}${it.due?' · termín '+fmtDay(it.due):''}`);
+  }
+});
+/* přetahování mezi dny */
+document.addEventListener('dragstart',e=>{
+  const el=e.target.closest&&e.target.closest('[data-drag]');
+  if(el){e.dataTransfer.setData('text/plain',el.dataset.drag);e.dataTransfer.effectAllowed='move'}
+});
+document.addEventListener('dragover',e=>{
+  const d=e.target.closest&&e.target.closest('[data-drop]');
+  if(d){e.preventDefault();document.querySelectorAll('.drop').forEach(x=>x.classList.remove('drop'));d.classList.add('drop')}
+});
+document.addEventListener('drop',e=>{
+  const d=e.target.closest&&e.target.closest('[data-drop]');if(!d)return;
+  e.preventDefault();
+  const [k,id]=e.dataTransfer.getData('text/plain').split(':');
+  const date=d.dataset.drop;
+  if(k==='w'){const w=wkById(id);if(w)w.date=date}
+  else if(k==='t'){const t=tkById(id);if(t)t.date=date}
+  save();render();
+});
+document.addEventListener('dragend',()=>document.querySelectorAll('.drop').forEach(x=>x.classList.remove('drop')));
+window.addEventListener('hashchange',()=>{const h=(location.hash||'#dnes').slice(1);if(h!==view){view=h;render()}});
+
+/* =====================  UKÁZKOVÁ DATA  ===================== */
+function loadDemo(){
+  const ws=mondayOf(today());
+  const pj=n=>S.projects.find(p=>p.name===n)||null;
+  const addP=(name,kw)=>{let p=pj(name);if(!p){p={id:uid(),name,color:colorFor(),keywords:[]};S.projects.push(p)}p.keywords=kw;return p};
+  const k=addP('Klienti',['klient','nabídk','smlouv','objednávk','poptávk']);
+  const a=addP('Administrativa',['faktur','účet','vyúčtov','porad','report']);
+  const m=addP('Marketing',['web','newsletter','instagram','kampa','článek','sociáln']);
+  const g={id:uid(),title:'Půlmaraton',sport:'run',target:'pod 2:00',deadline:addDays(today(),140),notes:'3× běh týdně, 1× síla, každý 4. týden odlehčený',done:false};
+  S.goals.push(g);
+  const tpl=[
+    [0,'06:30','run','Klidný běh Z2','Rozklus 10 min, 35 min plynule v Z2, 5 min vyklusat.',50,8,'Z2'],
+    [1,'','strength','Síla – core a nohy','Dřepy, výpady, mosty, plank. 3 série.',45,null,'střední'],
+    [3,'06:30','run','Tempový běh','Rozklus 15 min, 3× 8 min v tempu půlmaratonu, 3 min klus, vyklus 10 min.',60,10,'tempo'],
+    [4,'','mobility','Mobilita a protažení','Boky, kyčle, lýtka, záda.',30,null,'lehká'],
+    [6,'09:00','run','Dlouhý běh','Pomalu v Z2, poslední 2 km o něco svižněji.',90,14,'Z2']
+  ].map(([dow,time,sport,title,description,durMin,distKm,intensity])=>({id:uid(),dow,time,sport,title,description,durMin,distKm,intensity,goalId:g.id}));
+  S.template=tpl;
+  S.workouts=[];S.generatedWeeks=[];
+  [addDays(ws,-7),ws,addDays(ws,7)].forEach(w=>{genFromTemplate(w);S.generatedWeeks.push(w)});
+  S.workouts.filter(w=>w.date<today()).forEach((w,i)=>{if(i%5!==3){w.done=true;w.aDur=w.durMin;w.aDist=w.distKm;w.feel=3+(i%3);w.rpe=4+(i%4);w.aHr=140+(i%12)}});
+  const day=n=>addDays(ws,n);
+  S.tasks=[
+    {title:'Připravit nabídku pro nového klienta',projectId:k.id,prio:1,due:day(3),date:'',time:'',est:90},
+    {title:'Zavolat Novákovi ohledně smlouvy',projectId:k.id,prio:1,due:day(1),date:day(1),time:'10:00',est:15},
+    {title:'Zkontrolovat fakturu za říjen',projectId:a.id,prio:2,due:day(4),date:'',time:'',est:30},
+    {title:'Napsat newsletter',projectId:m.id,prio:2,due:day(4),date:'',time:'',est:60},
+    {title:'Aktualizovat texty na webu',projectId:m.id,prio:3,due:'',date:'',time:'',est:45}
+  ].map(t=>Object.assign({id:uid(),notes:'',done:false,created:Date.now()},t));
+  save();render();toast('Načtena ukázková data – smažeš je v Propojení → Smazat všechna data');
+}
+
+/* =====================  START  ===================== */
+applyTheme();
+render();
+initSync();
+stravaHandleCallback();
+initStrava();
+</script>
+</body>
+</html>
